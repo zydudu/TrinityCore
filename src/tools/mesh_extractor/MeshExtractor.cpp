@@ -56,7 +56,7 @@ bool IgnoreMap(uint32 id)
     return false;
 }
 
-void ExtractMMaps(std::set<uint32>& mapIds, uint32 threads)
+void ExtractMMaps(std::set<uint32>& mapIds, uint32 threads, TileLoc& tileLoc)
 {
     std::string basePath = "mmaps/";
     Utils::CreateDir(basePath);
@@ -84,7 +84,7 @@ void ExtractMMaps(std::set<uint32>& mapIds, uint32 threads)
         }
         printf("Building %s MapId %u\n", name.c_str(), mapId);
         ContinentBuilder builder(name, mapId, &wdt, threads);
-        builder.Build();
+        builder.Build(tileLoc);
     }
 }
 
@@ -290,7 +290,7 @@ void ExtractGameobjectModels()
     Constants::ToWoWCoords = false;
 }
 
-bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapList, bool& debugOutput, uint32& extractFlags)
+bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapList, bool& debugOutput, uint32& extractFlags, TileLoc& tileLoc)
 {
     char* param = NULL;
     extractFlags = 0;
@@ -333,6 +333,30 @@ bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapLis
             if (debugOutput)
                 printf("Output will contain debug information (.obj files)\n");
         }
+        else if (strcmp(argv[i], "--tile") == 0)
+        {
+            param = argv[++i];
+            if (!param)
+                return false;
+
+            char* stileX = strtok(param, ",");
+            char* stileY = strtok(NULL, ",");
+            int tilex = atoi(stileX);
+            int tiley = atoi(stileY);
+
+            if ((tilex > 0 && tilex < 64) || (tilex == 0 && strcmp(stileX, "0") == 0))
+                tileLoc.X = tilex;
+            if ((tiley > 0 && tiley < 64) || (tiley == 0 && strcmp(stileY, "0") == 0))
+                tileLoc.Y = tiley;
+
+            if (tileLoc.X < 0 || tileLoc.Y < 0)
+            {
+                printf("invalid tile coords.\n");
+                return false;
+            }
+
+            printf("Extracting only provided tile.\n", uint32(mapList.size()));
+        }
         else if (strcmp(argv[i], "--extract") == 0)
         {
             param = argv[++i];
@@ -361,6 +385,7 @@ void PrintUsage()
     printf("* Use \"--threads <number>\" to specify <number> threads, default to 4 (Only available when extracting MMaps)\n");
     printf("* Use \"--maps a,b,c,d,e\" to extract only the maps specified (Do not use spaces)\n");
     printf("* Use \"--debug 1\" to generate debug information of the tiles (Only available when extracting MMaps)\n");
+    printf("* Use \"--tile X,Y\" to extract the data of the specified tile\n");
     printf("* Use \"--extract X\" to extract the data specified by the flag X (Note: You can combine the flags with the bitwise OR operator |). Available flags are: \n");
     {
         printf("- %u to extract DBCs\n", Constants::EXTRACT_FLAG_DBC);
@@ -393,8 +418,9 @@ int main(int argc, char* argv[])
 {
     uint32 threads = 4, extractFlags = 0;
     std::set<uint32> mapIds;
+    TileLoc tileLoc = TileLoc();
 
-    if (!HandleArgs(argc, argv, threads, mapIds, Constants::Debug, extractFlags))
+    if (!HandleArgs(argc, argv, threads, mapIds, Constants::Debug, extractFlags, tileLoc))
     {
         PrintUsage();
         return -1;
@@ -415,7 +441,7 @@ int main(int argc, char* argv[])
         ExtractDBCs();
 
     if (extractFlags & Constants::EXTRACT_FLAG_MMAPS)
-        ExtractMMaps(mapIds, threads);
+        ExtractMMaps(mapIds, threads, tileLoc);
 
     if (extractFlags & Constants::EXTRACT_FLAG_GOB_MODELS)
         ExtractGameobjectModels();

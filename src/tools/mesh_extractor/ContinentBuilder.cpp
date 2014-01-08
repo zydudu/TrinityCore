@@ -54,7 +54,7 @@ void ContinentBuilder::CalculateTileBounds()
     getTileBounds(tileXMax, tileYMax, NULL, 0, bmin, bmax);
 }
 
-void ContinentBuilder::Build()
+void ContinentBuilder::Build(TileLoc& tileLoc)
 {
     char buff[50];
     sprintf(buff, "mmaps/%03u.mmap", MapId);
@@ -123,8 +123,20 @@ void ContinentBuilder::Build()
 
         printf("Map %s ( %u ) has %u tiles. Building them with %u threads\n", Continent.c_str(), MapId, uint32(TileMap->TileTable.size()), NumberOfThreads);
 
-        for (std::vector<TilePos>::iterator itr = TileMap->TileTable.begin(); itr != TileMap->TileTable.end(); ++itr)
-            pool->Enqueue(new TileBuildRequest(this, Continent, itr->X, itr->Y, MapId, params));
+        if (tileLoc.X != -1 && tileLoc.Y != -1)
+        {
+            for (std::vector<TilePos>::iterator itr = TileMap->TileTable.begin(); itr != TileMap->TileTable.end(); ++itr)
+                if (itr->X == tileLoc.X && itr->Y == tileLoc.Y)
+                {
+                    pool->Enqueue(new TileBuildRequest(this, Continent, itr->X, itr->Y, MapId, params));
+                    break;
+                }
+        }
+        else
+        {
+            for (std::vector<TilePos>::iterator itr = TileMap->TileTable.begin(); itr != TileMap->TileTable.end(); ++itr)
+                pool->Enqueue(new TileBuildRequest(this, Continent, itr->X, itr->Y, MapId, params));
+        }
 
         for (uint32 i = 0; i < NumberOfThreads; ++i)
             _threads.push_back(new BuilderThread(this, pool->Queue()));

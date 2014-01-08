@@ -76,4 +76,12 @@ public:
     static const int TilesPerMap;
 };
 
+struct TileLoc
+{
+    int X;
+    int Y;
+
+    TileLoc() : X(-1), Y(-1) {}
+};
+
 #endif

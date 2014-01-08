@@ -35,7 +35,7 @@ public:
         NumberOfThreads(tn), tileXMin(64), tileYMin(64), tileXMax(0), tileYMax(0)
         {}
 
-    void Build();
+    void Build(TileLoc& tileLoc);
     void getTileBounds(uint32 tileX, uint32 tileY, float* verts, int vertCount, float* bmin, float* bmax) const;
     void CalculateTileBounds();
     float bmin[3];
