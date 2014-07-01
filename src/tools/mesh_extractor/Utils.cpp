@@ -83,7 +83,7 @@ Vector3 Utils::TransformDoodadVertex(const IDefinition& def, Vector3 vec, bool t
     // This function applies to both external doodads and WMOs
 
     // Rotate our Doodad vertex
-    G3D::Matrix4 rot = G3D::Matrix3::fromEulerAnglesXYZ(Utils::ToRadians(def.Rotation.z), Utils::ToRadians(-def.Rotation.x), Utils::ToRadians(def.Rotation.y + 180));
+    G3D::Matrix4 rot = G3D::Matrix3::fromEulerAnglesZYX(Utils::ToRadians(def.Rotation.y + 180.0f), Utils::ToRadians(-def.Rotation.x), Utils::ToRadians(def.Rotation.z));
     Vector3 ret = Utils::VectorTransform(vec, rot);
 
     // And finally scale and translate it to our origin
