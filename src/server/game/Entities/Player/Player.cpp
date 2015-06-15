@@ -802,7 +802,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_dungeonDifficulty = DIFFICULTY_NORMAL;
     m_raidDifficulty = DIFFICULTY_NORMAL_RAID;
     m_legacyRaidDifficulty = DIFFICULTY_10_N;
-    m_raidMapDifficulty = DIFFICULTY_NORMAL_RAID;
+    m_prevMapDifficulty = DIFFICULTY_NORMAL_RAID;
 
     m_lastPotionId = 0;
     _talentMgr = new PlayerTalentInfo();
@@ -6782,12 +6782,12 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
     // victim_rank [1..4]  HK: <dishonored rank>
     // victim_rank [5..19] HK: <alliance\horde rank>
     // victim_rank [0, 20+] HK: <>
-    WorldPacket data(SMSG_PVP_CREDIT, 4+8+4);
-    data << uint32(honor);
-    data << victim_guid;
-    data << uint32(victim_rank);
+    WorldPackets::Combat::PvPCredit data;
+    data.Honor = honor;
+    data.Target = victim_guid;
+    data.Rank = victim_rank;
 
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(data.Write());
 
     // add honor points
     ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, int32(honor));
@@ -19990,10 +19990,10 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
     GetSession()->SendPacket(WorldPackets::Misc::ExplorationExperience(Experience, Area).Write());
 }
 
-void Player::SendDungeonDifficulty()
+void Player::SendDungeonDifficulty(int32 forcedDifficulty /*= -1*/)
 {
     WorldPackets::Misc::DungeonDifficultySet dungeonDifficultySet;
-    dungeonDifficultySet.DifficultyID = GetDungeonDifficultyID();
+    dungeonDifficultySet.DifficultyID = forcedDifficulty == -1 ? GetDungeonDifficultyID() : forcedDifficulty;
     GetSession()->SendPacket(dungeonDifficultySet.Write());
 }
 
@@ -20007,8 +20007,8 @@ void Player::SendRaidDifficulty(bool legacy, int32 forcedDifficulty /*= -1*/)
 
 void Player::SendResetFailedNotify(uint32 /*mapid*/)
 {
-    WorldPacket data(SMSG_RESET_FAILED_NOTIFY, 4);
-    GetSession()->SendPacket(&data);
+    WorldPackets::Instance::ResetFailedNotify data;
+    GetSession()->SendPacket(data.Write());
 }
 
 /// Reset all solo instances and optionally send a message on success for each
@@ -20069,9 +20069,9 @@ void Player::ResetInstances(uint8 method, bool isRaid, bool isLegacy)
 
 void Player::SendResetInstanceSuccess(uint32 MapId)
 {
-    WorldPacket data(SMSG_INSTANCE_RESET, 4);
-    data << uint32(MapId);
-    GetSession()->SendPacket(&data);
+    WorldPackets::Instance::InstanceReset data;
+    data.MapID = MapId;
+    GetSession()->SendPacket(data.Write());
 }
 
 void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
@@ -20081,10 +20081,11 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
     // 1: There are players offline in your party.
     // 2>: There are players in your party attempting to zone into an instance.
     */
-    WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 8);
-    data << uint32(reason);
-    data << uint32(MapId);
-    GetSession()->SendPacket(&data);
+
+    WorldPackets::Instance::InstanceResetFailed data;
+    data.MapID = MapId;
+    data.ResetFailedReason = reason;
+    GetSession()->SendPacket(data.Write());
 }
 
 /*********************************************************/
@@ -22642,11 +22643,20 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     if (GetMap()->IsRaid())
     {
-        DifficultyEntry const* difficulty = sDifficultyStore.AssertEntry(GetMap()->GetDifficultyID());
-        SendRaidDifficulty((difficulty->Flags & DIFFICULTY_FLAG_LEGACY) != 0, GetMap()->GetDifficultyID());
+        m_prevMapDifficulty = GetMap()->GetDifficultyID();
+        DifficultyEntry const* difficulty = sDifficultyStore.AssertEntry(m_prevMapDifficulty);
+        SendRaidDifficulty((difficulty->Flags & DIFFICULTY_FLAG_LEGACY) != 0, m_prevMapDifficulty);
     }
     else if (GetMap()->IsNonRaidDungeon())
-        SendDungeonDifficulty();
+    {
+        m_prevMapDifficulty = GetMap()->GetDifficultyID();
+        SendDungeonDifficulty(m_prevMapDifficulty);
+    }
+    else if (!GetMap()->Instanceable())
+    {
+        DifficultyEntry const* difficulty = sDifficultyStore.AssertEntry(m_prevMapDifficulty);
+        SendRaidDifficulty((difficulty->Flags & DIFFICULTY_FLAG_LEGACY) != 0);
+    }
 
     if (_garrison)
         _garrison->SendRemoteInfo();

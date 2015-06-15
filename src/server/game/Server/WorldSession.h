@@ -280,6 +280,7 @@ namespace WorldPackets
     namespace Instance
     {
         class InstanceInfo;
+        class ResetInstances;
     }
 
     namespace Item
@@ -497,6 +498,7 @@ namespace WorldPackets
         class SetActionButton;
         class UnlearnSkill;
         class SelfRes;
+        class GetMirrorImageData;
     }
 
     namespace Talent
@@ -1398,7 +1400,7 @@ class WorldSession
         void HandleRealmSplitOpcode(WorldPacket& recvData);
         void HandleTimeSyncResponse(WorldPackets::Misc::TimeSyncResponse& packet);
         void HandleWhoIsOpcode(WorldPackets::Who::WhoIsRequest& packet);
-        void HandleResetInstancesOpcode(WorldPacket& recvData);
+        void HandleResetInstancesOpcode(WorldPackets::Instance::ResetInstances& packet);
         void HandleInstanceLockResponse(WorldPacket& recvPacket);
 
         // Looking for Dungeon/Raid
@@ -1495,7 +1497,7 @@ class WorldSession
 
         // Miscellaneous
         void HandleSpellClick(WorldPacket& recvData);
-        void HandleMirrorImageDataRequest(WorldPacket& recvData);
+        void HandleMirrorImageDataRequest(WorldPackets::Spells::GetMirrorImageData& packet);
         void HandleRemoveGlyph(WorldPacket& recvData);
         void HandleGuildSetFocusedAchievement(WorldPackets::Achievement::GuildSetFocusedAchievement& setFocusedAchievement);
         void HandleEquipmentSetSave(WorldPackets::EquipmentSet::SaveEquipmentSet& packet);
