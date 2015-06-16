@@ -377,10 +377,10 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
 
             switch (Player::TeamIdForRace(charCreate.CreateInfo->Race))
             {
-                case TEAM_ALLIANCE:
+                case BATTLEGROUND_TEAM_ALLIANCE_GOLD:
                     disabled = (mask & (1 << 0)) != 0;
                     break;
-                case TEAM_HORDE:
+                case BATTLEGROUND_TEAM_HORDE_GREEN:
                     disabled = (mask & (1 << 1)) != 0;
                     break;
                 case TEAM_NEUTRAL:
@@ -1945,7 +1945,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
         stmt->setUInt64(0, lowGuid);
 
         // Faction specific languages
-        if (newTeamId == TEAM_HORDE)
+        if (newTeamId == BATTLEGROUND_TEAM_HORDE_GREEN)
             stmt->setUInt16(1, 109);
         else
             stmt->setUInt16(1, 98);
@@ -2012,7 +2012,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
                 if (numFullTaximasks > 11)
                     numFullTaximasks = 11;
 
-                if (newTeamId == TEAM_ALLIANCE)
+                if (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD)
                 {
                     if (playerClass != CLASS_DEATH_KNIGHT)
                     {
@@ -2086,7 +2086,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
 
             WorldLocation loc;
             uint16 zoneId = 0;
-            if (newTeamId == TEAM_ALLIANCE)
+            if (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD)
             {
                 loc.WorldRelocate(0, -8867.68f, 673.373f, 97.9034f, 0.0f);
                 zoneId = 1519;
@@ -2113,13 +2113,13 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
                 uint32 achiev_horde = it->second;
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_BY_ACHIEVEMENT);
-                stmt->setUInt16(0, uint16(newTeamId == TEAM_ALLIANCE ? achiev_alliance : achiev_horde));
+                stmt->setUInt16(0, uint16(newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? achiev_alliance : achiev_horde));
                 stmt->setUInt64(1, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ACHIEVEMENT);
-                stmt->setUInt16(0, uint16(newTeamId == TEAM_ALLIANCE ? achiev_alliance : achiev_horde));
-                stmt->setUInt16(1, uint16(newTeamId == TEAM_ALLIANCE ? achiev_horde : achiev_alliance));
+                stmt->setUInt16(0, uint16(newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? achiev_alliance : achiev_horde));
+                stmt->setUInt16(1, uint16(newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? achiev_horde : achiev_alliance));
                 stmt->setUInt64(2, lowGuid);
                 trans->Append(stmt);
             }
@@ -2131,8 +2131,8 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
                 uint32 item_horde = it->second;
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INVENTORY_FACTION_CHANGE);
-                stmt->setUInt32(0, (newTeamId == TEAM_ALLIANCE ? item_alliance : item_horde));
-                stmt->setUInt32(1, (newTeamId == TEAM_ALLIANCE ? item_horde : item_alliance));
+                stmt->setUInt32(0, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? item_alliance : item_horde));
+                stmt->setUInt32(1, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? item_horde : item_alliance));
                 stmt->setUInt64(2, lowGuid);
                 trans->Append(stmt);
             }
@@ -2150,12 +2150,12 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
                 stmt->setUInt64(0, lowGuid);
-                stmt->setUInt32(1, (newTeamId == TEAM_ALLIANCE ? quest_alliance : quest_horde));
+                stmt->setUInt32(1, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? quest_alliance : quest_horde));
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_QUESTSTATUS_REWARDED_FACTION_CHANGE);
-                stmt->setUInt32(0, (newTeamId == TEAM_ALLIANCE ? quest_alliance : quest_horde));
-                stmt->setUInt32(1, (newTeamId == TEAM_ALLIANCE ? quest_horde : quest_alliance));
+                stmt->setUInt32(0, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? quest_alliance : quest_horde));
+                stmt->setUInt32(1, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? quest_horde : quest_alliance));
                 stmt->setUInt64(2, lowGuid);
                 trans->Append(stmt);
             }
@@ -2171,7 +2171,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
                 for (ObjectMgr::QuestMap::const_iterator iter = questTemplates.begin(); iter != questTemplates.end(); ++iter)
                 {
                     Quest const* quest = iter->second;
-                    uint32 newRaceMask = (newTeamId == TEAM_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE;
+                    uint32 newRaceMask = (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD) ? RACEMASK_ALLIANCE : RACEMASK_HORDE;
                     if (quest->GetAllowableRaces() != -1 && !(quest->GetAllowableRaces() & newRaceMask))
                     {
                         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_QUESTSTATUS_REWARDED_ACTIVE_BY_QUEST);
@@ -2189,13 +2189,13 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
                 uint32 spell_horde = it->second;
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
-                stmt->setUInt32(0, (newTeamId == TEAM_ALLIANCE ? spell_alliance : spell_horde));
+                stmt->setUInt32(0, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? spell_alliance : spell_horde));
                 stmt->setUInt64(1, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_SPELL_FACTION_CHANGE);
-                stmt->setUInt32(0, (newTeamId == TEAM_ALLIANCE ? spell_alliance : spell_horde));
-                stmt->setUInt32(1, (newTeamId == TEAM_ALLIANCE ? spell_horde : spell_alliance));
+                stmt->setUInt32(0, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? spell_alliance : spell_horde));
+                stmt->setUInt32(1, (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? spell_horde : spell_alliance));
                 stmt->setUInt64(2, lowGuid);
                 trans->Append(stmt);
             }
@@ -2205,8 +2205,8 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
             {
                 uint32 reputation_alliance = it->first;
                 uint32 reputation_horde = it->second;
-                uint32 newReputation = (newTeamId == TEAM_ALLIANCE) ? reputation_alliance : reputation_horde;
-                uint32 oldReputation = (newTeamId == TEAM_ALLIANCE) ? reputation_horde : reputation_alliance;
+                uint32 newReputation = (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD) ? reputation_alliance : reputation_horde;
+                uint32 oldReputation = (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD) ? reputation_horde : reputation_alliance;
 
                 // select old standing set in db
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_REP_BY_FACTION);
@@ -2267,7 +2267,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(PreparedQueryResult res
                     CharTitlesEntry const* atitleInfo = sCharTitlesStore.LookupEntry(title_alliance);
                     CharTitlesEntry const* htitleInfo = sCharTitlesStore.LookupEntry(title_horde);
                     // new team
-                    if (newTeamId == TEAM_ALLIANCE)
+                    if (newTeamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD)
                     {
                         uint32 maskID = htitleInfo->MaskID;
                         uint32 index = maskID / 32;

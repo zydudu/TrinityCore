@@ -250,7 +250,7 @@ void WorldSession::HandleChatMessage(ChatMsg type, uint32 lang, std::string msg,
                 return;
             }
 
-            if (GetPlayer()->GetTeam() != receiver->GetTeam() && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) && !receiver->IsInWhisperWhiteList(sender->GetGUID()))
+            if (GetPlayer()->GetPlayerFaction() != receiver->GetPlayerFaction() && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) && !receiver->IsInWhisperWhiteList(sender->GetGUID()))
             {
                 SendChatPlayerNotfoundNotice(target);
                 return;
@@ -359,7 +359,7 @@ void WorldSession::HandleChatMessage(ChatMsg type, uint32 lang, std::string msg,
                 }
             }
 
-            if (ChannelMgr* cMgr = ChannelMgr::ForTeam(sender->GetTeam()))
+            if (ChannelMgr* cMgr = ChannelMgr::ForTeam(sender->GetPlayerFaction()))
             {
                 if (Channel* chn = cMgr->GetChannel(target, sender))
                 {
@@ -490,7 +490,7 @@ void WorldSession::HandleChatAddonMessage(ChatMsg type, std::string prefix, std:
         }
         case CHAT_MSG_CHANNEL:
         {
-            if (ChannelMgr* cMgr = ChannelMgr::ForTeam(sender->GetTeam()))
+            if (ChannelMgr* cMgr = ChannelMgr::ForTeam(sender->GetPlayerFaction()))
                 if (Channel* chn = cMgr->GetChannel(target, sender, false))
                     chn->Say(sender->GetGUID(), text.c_str(), uint32(LANG_ADDON));
             break;

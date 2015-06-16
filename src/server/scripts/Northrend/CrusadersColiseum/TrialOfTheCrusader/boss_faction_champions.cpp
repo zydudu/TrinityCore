@@ -636,7 +636,7 @@ struct boss_faction_championsAI : public BossAI
 
             if (!players.isEmpty())
                 if (Player* player = players.begin()->GetSource())
-                    TeamInInstance = player->GetTeam();
+                    TeamInInstance = player->GetPlayerFaction();
 
             if (TeamInInstance == ALLIANCE)
             {

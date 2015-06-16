@@ -389,13 +389,13 @@ class Battleground
         void SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 strId1 = 0, uint32 strId2 = 0);
 
         // Raid Group
-        Group* GetBgRaid(uint32 TeamID) const { return TeamID == ALLIANCE ? m_BgRaids[TEAM_ALLIANCE] : m_BgRaids[TEAM_HORDE]; }
+        Group* GetBgRaid(uint32 TeamID) const { return TeamID == ALLIANCE ? m_BgRaids[BATTLEGROUND_TEAM_ALLIANCE_GOLD] : m_BgRaids[BATTLEGROUND_TEAM_HORDE_GREEN]; }
         void SetBgRaid(uint32 TeamID, Group* bg_raid);
 
         void BuildPvPLogDataPacket(WorldPackets::Battleground::PVPLogData& pvpLogData);
         virtual bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
 
-        static TeamId GetTeamIndexByTeamId(uint32 Team) { return Team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
+        static TeamId GetTeamIndexByTeamId(uint32 Team) { return Team == ALLIANCE ? BATTLEGROUND_TEAM_ALLIANCE_GOLD : BATTLEGROUND_TEAM_HORDE_GREEN; }
         uint32 GetPlayersCountByTeam(uint32 Team) const { return m_PlayersCount[GetTeamIndexByTeamId(Team)]; }
         uint32 GetAlivePlayersCountByTeam(uint32 Team) const;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
         void UpdatePlayersCountByTeam(uint32 Team, bool remove)

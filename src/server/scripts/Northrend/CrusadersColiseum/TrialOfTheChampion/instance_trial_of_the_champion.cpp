@@ -95,7 +95,7 @@ public:
             if (!players.isEmpty())
             {
                 if (Player* player = players.begin()->GetSource())
-                    TeamInInstance = player->GetTeam();
+                    TeamInInstance = player->GetPlayerFaction();
             }
 
             switch (creature->GetEntry())

@@ -2318,7 +2318,7 @@ void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, uin
             itr->second->GetPlayer() &&
             itr->second->GetPlayer()->IsInWorld() &&
             itr->second != self &&
-            (team == 0 || itr->second->GetPlayer()->GetTeam() == team))
+            (team == 0 || itr->second->GetPlayer()->GetPlayerFaction() == team))
         {
             itr->second->SendPacket(packet);
         }
@@ -2341,7 +2341,7 @@ void World::SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self, u
             continue;
 
         // Send only to same team, if team is given
-        if (!team || player->GetTeam() == team)
+        if (!team || player->GetPlayerFaction() == team)
             session->SendPacket(packet);
     }
 }
@@ -2470,7 +2470,7 @@ bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession
             itr->second->GetPlayer()->IsInWorld() &&
             itr->second->GetPlayer()->GetZoneId() == zone &&
             itr->second != self &&
-            (team == 0 || itr->second->GetPlayer()->GetTeam() == team))
+            (team == 0 || itr->second->GetPlayer()->GetPlayerFaction() == team))
         {
             itr->second->SendPacket(packet);
             foundPlayerToSend = true;

@@ -325,7 +325,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM:
             if (!target || target->GetTypeId() != TYPEID_PLAYER)
                 return false;
-            return target->ToPlayer()->GetTeam() == team.team;
+            return target->ToPlayer()->GetPlayerFaction() == team.team;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_DRUNK:
             return Player::GetDrunkenstateByValue(source->GetDrunkValue()) >= DrunkenState(drunk.state);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
@@ -338,7 +338,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             if (!bg)
                 return false;
 
-            uint32 score = bg->GetTeamScore(source->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+            uint32 score = bg->GetTeamScore(source->GetBattlegroundTeamId() == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? BATTLEGROUND_TEAM_HORDE_GREEN : BATTLEGROUND_TEAM_ALLIANCE_GOLD);
             return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT:
@@ -1771,7 +1771,7 @@ void AchievementMgr<Player>::CompletedAchievement(AchievementEntry const* achiev
     //! Since no common attributes were found, (not even in titleRewardFlags field)
     //! we explicitly check by ID. Maybe in the future we could move the achievement_reward
     //! condition fields to the condition system.
-    if (uint32 titleId = reward->titleId[achievement->ID == 1793 ? GetOwner()->getGender() : (GetOwner()->GetTeam() == ALLIANCE ? 0 : 1)])
+    if (uint32 titleId = reward->titleId[achievement->ID == 1793 ? GetOwner()->getGender() : (GetOwner()->GetPlayerFaction() == ALLIANCE ? 0 : 1)])
         if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
             GetOwner()->SetTitle(titleEntry);
 
@@ -2036,8 +2036,8 @@ bool AchievementMgr<T>::CanUpdateCriteria(AchievementCriteria const* criteria, A
             continue;
         }
 
-        if ((tree->Achievement->Faction == ACHIEVEMENT_FACTION_HORDE    && referencePlayer->GetTeam() != HORDE) ||
-            (tree->Achievement->Faction == ACHIEVEMENT_FACTION_ALLIANCE && referencePlayer->GetTeam() != ALLIANCE))
+        if ((tree->Achievement->Faction == ACHIEVEMENT_FACTION_HORDE    && referencePlayer->GetPlayerFaction() != HORDE) ||
+            (tree->Achievement->Faction == ACHIEVEMENT_FACTION_ALLIANCE && referencePlayer->GetPlayerFaction() != ALLIANCE))
         {
             TC_LOG_TRACE("achievement", "CanUpdateCriteria: (Id: %u Type %s Achievement %u) Wrong faction",
                 criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->Entry->Type), tree->Achievement->ID);

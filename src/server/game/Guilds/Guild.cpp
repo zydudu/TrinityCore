@@ -1605,7 +1605,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     if (pInvitee->GetSocial()->HasIgnore(player->GetGUID()))
         return;
 
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeam() != player->GetTeam())
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetPlayerFaction() != player->GetPlayerFaction())
     {
         SendCommandResult(session, GUILD_COMMAND_INVITE_PLAYER, ERR_GUILD_NOT_ALLIED, name);
         return;
@@ -1670,7 +1670,7 @@ void Guild::HandleAcceptMember(WorldSession* session)
 {
     Player* player = session->GetPlayer();
     if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) &&
-        player->GetTeam() != ObjectMgr::GetPlayerTeamByGUID(GetLeaderGUID()))
+        player->GetPlayerFaction() != ObjectMgr::GetPlayerTeamByGUID(GetLeaderGUID()))
         return;
 
     AddMember(player->GetGUID());
@@ -1979,7 +1979,7 @@ void Guild::HandleGuildPartyRequest(WorldSession* session)
         return;
 
     WorldPackets::Guild::GuildPartyState partyStateResponse;
-    partyStateResponse.InGuildParty = (player->GetMap()->GetOwnerGuildId(player->GetTeam()) == GetId());
+    partyStateResponse.InGuildParty = (player->GetMap()->GetOwnerGuildId(player->GetPlayerFaction()) == GetId());
     partyStateResponse.NumMembers = 0;
     partyStateResponse.NumRequired = 0;
     partyStateResponse.GuildXPEarnedMult = 0.0f;

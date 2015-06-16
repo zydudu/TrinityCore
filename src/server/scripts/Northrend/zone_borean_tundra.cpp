@@ -659,7 +659,7 @@ public:
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
 
-            switch (player->GetTeam())
+            switch (player->GetPlayerFaction())
             {
                 case ALLIANCE:
                     creature->setFaction(FACTION_ESCORTEE_A);
@@ -1693,7 +1693,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
-            switch (player->GetTeam())
+            switch (player->GetPlayerFaction())
             {
             case ALLIANCE:
                 creature->setFaction(FACTION_ESCORTEE_A);

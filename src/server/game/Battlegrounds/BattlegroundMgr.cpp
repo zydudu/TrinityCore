@@ -452,8 +452,8 @@ bool BattlegroundMgr::CreateBattleground(BattlegroundTemplate const* bgTemplate)
     bg->SetMaxPlayersPerTeam(bgTemplate->MaxPlayersPerTeam);
     bg->SetMinPlayers(bgTemplate->MinPlayersPerTeam * 2);
     bg->SetMaxPlayers(bgTemplate->MaxPlayersPerTeam * 2);
-    bg->SetTeamStartPosition(TEAM_ALLIANCE, bgTemplate->StartLocation[TEAM_ALLIANCE]);
-    bg->SetTeamStartPosition(TEAM_HORDE, bgTemplate->StartLocation[TEAM_HORDE]);
+    bg->SetTeamStartPosition(BATTLEGROUND_TEAM_ALLIANCE_GOLD, bgTemplate->StartLocation[BATTLEGROUND_TEAM_ALLIANCE_GOLD]);
+    bg->SetTeamStartPosition(BATTLEGROUND_TEAM_HORDE_GREEN, bgTemplate->StartLocation[BATTLEGROUND_TEAM_HORDE_GREEN]);
     bg->SetStartMaxDist(bgTemplate->MaxStartDistSq);
     bg->SetLevelRange(bgTemplate->MinLevel, bgTemplate->MaxLevel);
     bg->SetScriptId(bgTemplate->ScriptId);
@@ -529,7 +529,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
             uint32 startId = fields[5].GetUInt32();
             if (WorldSafeLocsEntry const* start = sWorldSafeLocsStore.LookupEntry(startId))
             {
-                bgTemplate.StartLocation[TEAM_ALLIANCE].Relocate(start->Loc.X, start->Loc.Y, start->Loc.Z, (start->Facing * M_PI) / 180);
+                bgTemplate.StartLocation[BATTLEGROUND_TEAM_ALLIANCE_GOLD].Relocate(start->Loc.X, start->Loc.Y, start->Loc.Z, (start->Facing * M_PI) / 180);
             }
             else
             {
@@ -540,7 +540,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
             startId = fields[6].GetUInt32();
             if (WorldSafeLocsEntry const* start = sWorldSafeLocsStore.LookupEntry(startId))
             {
-                bgTemplate.StartLocation[TEAM_HORDE].Relocate(start->Loc.X, start->Loc.Y, start->Loc.Z, (start->Facing * M_PI) / 180);
+                bgTemplate.StartLocation[BATTLEGROUND_TEAM_HORDE_GREEN].Relocate(start->Loc.X, start->Loc.Y, start->Loc.Z, (start->Facing * M_PI) / 180);
             }
             else
             {

@@ -47,7 +47,7 @@ enum ObjectiveStates
     OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE
 };
 
-#define OTHER_TEAM(a) (a == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE)
+#define OTHER_TEAM(a) (a == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? BATTLEGROUND_TEAM_HORDE_GREEN : BATTLEGROUND_TEAM_ALLIANCE_GOLD)
 
 // struct for go spawning
 struct go_type
@@ -251,9 +251,9 @@ class OutdoorPvP : public ZoneScript
             switch (team)
             {
                 case ALLIANCE:
-                    return TEAM_ALLIANCE;
+                    return BATTLEGROUND_TEAM_ALLIANCE_GOLD;
                 case HORDE:
-                    return TEAM_HORDE;
+                    return BATTLEGROUND_TEAM_HORDE_GREEN;
                 default:
                     return TEAM_NEUTRAL;
             }

@@ -1212,9 +1212,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             // team that controls the workshop in the specified area
             uint32 team = bf->GetData(newArea);
 
-            if (team == TEAM_HORDE)
+            if (team == BATTLEGROUND_TEAM_HORDE_GREEN)
                 return spellId == 56618;
-            else if (team == TEAM_ALLIANCE)
+            else if (team == BATTLEGROUND_TEAM_ALLIANCE_GOLD)
                 return spellId == 56617;
             break;
         }
@@ -1225,7 +1225,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return false;
 
             if (Battlefield* battlefieldWG = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
-                return battlefieldWG->IsEnabled() && (player->GetTeamId() == battlefieldWG->GetDefenderTeam()) && !battlefieldWG->IsWarTime();
+                return battlefieldWG->IsEnabled() && (player->GetBattlegroundTeamId() == battlefieldWG->GetDefenderTeam()) && !battlefieldWG->IsWarTime();
             break;
         }
         case 74411: // Battleground - Dampening

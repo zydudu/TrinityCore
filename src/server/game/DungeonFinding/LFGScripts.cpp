@@ -66,7 +66,7 @@ void LFGPlayerScript::OnLogin(Player* player, bool /*loginFirst*/)
         }
     }
 
-    sLFGMgr->SetTeam(player->GetGUID(), player->GetTeam());
+    sLFGMgr->SetTeam(player->GetGUID(), player->GetPlayerFaction());
     /// @todo - Restore LfgPlayerData and send proper status to player if it was in a group
 }
 

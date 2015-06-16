@@ -148,7 +148,7 @@ public:
             if (who->HasAura(SPELL_TRESPASSER_H) || who->HasAura(SPELL_TRESPASSER_A))
                 return;
 
-            if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
+            if (who->ToPlayer()->GetBattlegroundTeamId() == BATTLEGROUND_TEAM_ALLIANCE_GOLD)
                 who->CastSpell(who, SPELL_TRESPASSER_H, true);
             else
                 who->CastSpell(who, SPELL_TRESPASSER_A, true);

@@ -390,10 +390,10 @@ bool LootItem::AllowedForPlayer(Player const* player) const
         return false;
 
     // not show loot for not own team
-    if ((pProto->GetFlags2() & ITEM_FLAG2_HORDE_ONLY) && player->GetTeam() != HORDE)
+    if ((pProto->GetFlags2() & ITEM_FLAG2_HORDE_ONLY) && player->GetPlayerFaction() != HORDE)
         return false;
 
-    if ((pProto->GetFlags2() & ITEM_FLAG2_ALLIANCE_ONLY) && player->GetTeam() != ALLIANCE)
+    if ((pProto->GetFlags2() & ITEM_FLAG2_ALLIANCE_ONLY) && player->GetPlayerFaction() != ALLIANCE)
         return false;
 
     // check quest requirements

@@ -159,7 +159,7 @@ class instance_ulduar : public InstanceMapScript
             void OnPlayerEnter(Player* player) override
             {
                 if (!TeamInInstance)
-                    TeamInInstance = player->GetTeam();
+                    TeamInInstance = player->GetPlayerFaction();
 
                 if (_summonAlgalon)
                 {
@@ -211,7 +211,7 @@ class instance_ulduar : public InstanceMapScript
                     Map::PlayerList const& Players = instance->GetPlayers();
                     if (!Players.isEmpty())
                         if (Player* player = Players.begin()->GetSource())
-                            TeamInInstance = player->GetTeam();
+                            TeamInInstance = player->GetPlayerFaction();
                 }
 
                 switch (creature->GetEntry())

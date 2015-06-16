@@ -38,7 +38,7 @@ class instance_forge_of_souls : public InstanceMapScript
             void OnPlayerEnter(Player* player) override
             {
                 if (!teamInInstance)
-                    teamInInstance = player->GetTeam();
+                    teamInInstance = player->GetPlayerFaction();
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -48,7 +48,7 @@ class instance_forge_of_souls : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            teamInInstance = player->GetTeam();
+                            teamInInstance = player->GetPlayerFaction();
                 }
 
                 switch (creature->GetEntry())

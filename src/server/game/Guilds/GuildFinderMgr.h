@@ -160,7 +160,7 @@ struct LFGuildPlayer
 struct LFGuildSettings : public LFGuildPlayer
 {
     public:
-        LFGuildSettings() : LFGuildPlayer(), _listed(false), _team(TEAM_ALLIANCE) {}
+        LFGuildSettings() : LFGuildPlayer(), _listed(false), _team(BATTLEGROUND_TEAM_ALLIANCE_GOLD) {}
 
         LFGuildSettings(bool listed, TeamId team) : LFGuildPlayer(), _listed(listed), _team(team) {}
 
@@ -252,7 +252,7 @@ class GuildFinderMgr
         /**
          * @brief Returns a store of guilds matching the settings provided, using bitmask operators.
          * @param settings The player's finder settings
-         * @param teamId   The player's faction (TEAM_ALLIANCE or TEAM_HORDE)
+         * @param teamId   The player's faction (BATTLEGROUND_TEAM_ALLIANCE_GOLD or TEAM_HORDE)
          */
         LFGuildStore GetGuildsMatchingSetting(LFGuildPlayer& settings, TeamId faction);
 

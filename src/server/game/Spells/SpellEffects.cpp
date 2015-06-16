@@ -1052,7 +1052,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                     case 5:
                     // Transform
                     {
-                        if (m_caster->ToPlayer()->GetTeam() == ALLIANCE)
+                        if (m_caster->ToPlayer()->GetPlayerFaction() == ALLIANCE)
                             m_caster->CastSpell(m_caster, 36897, true);
                         else
                             m_caster->CastSpell(m_caster, 36899, true);
@@ -1093,7 +1093,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                     case 4:
                         // Transform
                     {
-                        if (m_caster->ToPlayer()->GetTeam() == ALLIANCE)
+                        if (m_caster->ToPlayer()->GetPlayerFaction() == ALLIANCE)
                             m_caster->CastSpell(m_caster, 36897, true);
                         else
                             m_caster->CastSpell(m_caster, 36899, true);
@@ -3238,7 +3238,7 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
     if (pGameObj->GetGoType() == GAMEOBJECT_TYPE_FLAGDROP)
         if (Player* player = m_caster->ToPlayer())
             if (Battleground* bg = player->GetBattleground())
-                bg->SetDroppedFlagGUID(pGameObj->GetGUID(), player->GetTeam() == ALLIANCE ? TEAM_HORDE: TEAM_ALLIANCE);
+                bg->SetDroppedFlagGUID(pGameObj->GetGUID(), player->GetPlayerFaction() == ALLIANCE ? BATTLEGROUND_TEAM_HORDE_GREEN: BATTLEGROUND_TEAM_ALLIANCE_GOLD);
 
     if (uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
     {

@@ -83,7 +83,7 @@ bool OutdoorPvPHP::SetupOutdoorPvP()
 void OutdoorPvPHP::HandlePlayerEnterZone(Player* player, uint32 zone)
 {
     // add buffs
-    if (player->GetTeam() == ALLIANCE)
+    if (player->GetPlayerFaction() == ALLIANCE)
     {
         if (m_AllianceTowersControlled >=3)
             player->CastSpell(player, AllianceBuff, true);
@@ -99,7 +99,7 @@ void OutdoorPvPHP::HandlePlayerEnterZone(Player* player, uint32 zone)
 void OutdoorPvPHP::HandlePlayerLeaveZone(Player* player, uint32 zone)
 {
     // remove buffs
-    if (player->GetTeam() == ALLIANCE)
+    if (player->GetPlayerFaction() == ALLIANCE)
     {
         player->RemoveAurasDueToSpell(AllianceBuff);
     }
@@ -116,13 +116,13 @@ bool OutdoorPvPHP::Update(uint32 diff)
     if (changed)
     {
         if (m_AllianceTowersControlled == 3)
-            TeamApplyBuff(TEAM_ALLIANCE, AllianceBuff, HordeBuff);
+            TeamApplyBuff(BATTLEGROUND_TEAM_ALLIANCE_GOLD, AllianceBuff, HordeBuff);
         else if (m_HordeTowersControlled == 3)
-            TeamApplyBuff(TEAM_HORDE, HordeBuff, AllianceBuff);
+            TeamApplyBuff(BATTLEGROUND_TEAM_HORDE_GREEN, HordeBuff, AllianceBuff);
         else
         {
-            TeamCastSpell(TEAM_ALLIANCE, -AllianceBuff);
-            TeamCastSpell(TEAM_HORDE, -HordeBuff);
+            TeamCastSpell(BATTLEGROUND_TEAM_ALLIANCE_GOLD, -AllianceBuff);
+            TeamCastSpell(BATTLEGROUND_TEAM_HORDE_GREEN, -HordeBuff);
         }
         SendUpdateWorldState(HP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
         SendUpdateWorldState(HP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
@@ -291,9 +291,9 @@ void OutdoorPvPHP::HandleKillImpl(Player* player, Unit* killed)
     if (killed->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    if (player->GetTeam() == ALLIANCE && killed->ToPlayer()->GetTeam() != ALLIANCE)
+    if (player->GetPlayerFaction() == ALLIANCE && killed->ToPlayer()->GetPlayerFaction() != ALLIANCE)
         player->CastSpell(player, AlliancePlayerKillReward, true);
-    else if (player->GetTeam() == HORDE && killed->ToPlayer()->GetTeam() != HORDE)
+    else if (player->GetPlayerFaction() == HORDE && killed->ToPlayer()->GetPlayerFaction() != HORDE)
         player->CastSpell(player, HordePlayerKillReward, true);
 }
 

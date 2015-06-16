@@ -91,7 +91,7 @@ public:
             switch (me->GetEntry())
             {
                 case NPC_SILVER_COVENANT_GUARDIAN_MAGE:
-                    if (player->GetTeam() == HORDE)              // Horde unit found in Alliance area
+                    if (player->GetPlayerFaction() == HORDE)              // Horde unit found in Alliance area
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_APPLEBOUGH_A, 32.0f))
                         {
@@ -103,7 +103,7 @@ public:
                     }
                     break;
                 case NPC_SUNREAVER_GUARDIAN_MAGE:
-                    if (player->GetTeam() == ALLIANCE)           // Alliance unit found in Horde area
+                    if (player->GetPlayerFaction() == ALLIANCE)           // Alliance unit found in Horde area
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_SWEETBERRY_H, 32.0f))
                         {

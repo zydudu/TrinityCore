@@ -1909,7 +1909,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         return ERR_BATTLEGROUND_JOIN_FAILED;
 
     uint32 arenaTeamId = reference->GetArenaTeamId(arenaSlot);
-    uint32 team = reference->GetTeam();
+    uint32 team = reference->GetPlayerFaction();
 
     BattlegroundQueueTypeId bgQueueTypeIdRandom = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_RB, 0);
 
@@ -1922,7 +1922,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         if (!member)
             return ERR_BATTLEGROUND_JOIN_FAILED;
         // don't allow cross-faction join as group
-        if (member->GetTeam() != team)
+        if (member->GetPlayerFaction() != team)
         {
             errorGuid = member->GetGUID();
             return ERR_BATTLEGROUND_JOIN_TIMED_OUT;

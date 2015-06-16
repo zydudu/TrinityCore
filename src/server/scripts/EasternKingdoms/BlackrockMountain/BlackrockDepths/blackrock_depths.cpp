@@ -478,7 +478,7 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+9:
                 player->CLOSE_GOSSIP_MENU();
-                if (player->GetTeam() == HORDE)
+                if (player->GetPlayerFaction() == HORDE)
                     player->AreaExploredOrEventHappens(QUEST_4001);
                 else
                     player->AreaExploredOrEventHappens(QUEST_4342);
@@ -498,7 +498,7 @@ public:
         if (player->GetQuestStatus(4342) == QUEST_STATUS_INCOMPLETE)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
 
-        if (player->GetTeam() == HORDE)
+        if (player->GetPlayerFaction() == HORDE)
             player->SEND_GOSSIP_MENU(2473, creature->GetGUID());
         else
             player->SEND_GOSSIP_MENU(2474, creature->GetGUID());

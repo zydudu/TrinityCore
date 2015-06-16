@@ -2202,8 +2202,8 @@ class Player : public Unit, public GridObject<Player>
 
         static uint32 TeamForRace(uint8 race);
         static TeamId TeamIdForRace(uint8 race);
-        uint32 GetTeam() const { return m_team; }
-        TeamId GetTeamId() const { return m_team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
+        uint32 GetPlayerFaction() const { return m_team; }
+        TeamId GetBattlegroundTeamId() const { return m_team == ALLIANCE ? BATTLEGROUND_TEAM_ALLIANCE_GOLD : BATTLEGROUND_TEAM_HORDE_GREEN; }
         void setFactionForRace(uint8 race);
 
         void InitDisplayIds();

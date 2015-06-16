@@ -157,20 +157,20 @@ Battleground::Battleground()
     m_StartMaxDist      = 0.0f;
     ScriptId            = 0;
 
-    m_ArenaTeamIds[TEAM_ALLIANCE]   = 0;
-    m_ArenaTeamIds[TEAM_HORDE]      = 0;
+    m_ArenaTeamIds[BATTLEGROUND_TEAM_ALLIANCE_GOLD]   = 0;
+    m_ArenaTeamIds[BATTLEGROUND_TEAM_HORDE_GREEN]      = 0;
 
-    m_ArenaTeamMMR[TEAM_ALLIANCE]   = 0;
-    m_ArenaTeamMMR[TEAM_HORDE]      = 0;
+    m_ArenaTeamMMR[BATTLEGROUND_TEAM_ALLIANCE_GOLD]   = 0;
+    m_ArenaTeamMMR[BATTLEGROUND_TEAM_HORDE_GREEN]      = 0;
 
-    m_BgRaids[TEAM_ALLIANCE]         = NULL;
-    m_BgRaids[TEAM_HORDE]            = NULL;
+    m_BgRaids[BATTLEGROUND_TEAM_ALLIANCE_GOLD]         = NULL;
+    m_BgRaids[BATTLEGROUND_TEAM_HORDE_GREEN]            = NULL;
 
-    m_PlayersCount[TEAM_ALLIANCE]    = 0;
-    m_PlayersCount[TEAM_HORDE]       = 0;
+    m_PlayersCount[BATTLEGROUND_TEAM_ALLIANCE_GOLD]    = 0;
+    m_PlayersCount[BATTLEGROUND_TEAM_HORDE_GREEN]       = 0;
 
-    m_TeamScores[TEAM_ALLIANCE]      = 0;
-    m_TeamScores[TEAM_HORDE]         = 0;
+    m_TeamScores[BATTLEGROUND_TEAM_ALLIANCE_GOLD]      = 0;
+    m_TeamScores[BATTLEGROUND_TEAM_HORDE_GREEN]         = 0;
 
     m_PrematureCountDown = false;
     m_PrematureCountDownTimer = 0;
@@ -638,7 +638,7 @@ Player* Battleground::_GetPlayerForTeam(uint32 teamId, BattlegroundPlayerMap::co
     {
         uint32 team = itr->second.Team;
         if (!team)
-            team = player->GetTeam();
+            team = player->GetPlayerFaction();
         if (team != teamId)
             player = NULL;
     }
@@ -1072,7 +1072,7 @@ void Battleground::StartBattleground()
     sBattlegroundMgr->AddBattleground(this);
 
     if (m_IsRated)
-        TC_LOG_DEBUG("bg.arena", "Arena match type: %u for Team1Id: %u - Team2Id: %u started.", m_ArenaType, m_ArenaTeamIds[TEAM_ALLIANCE], m_ArenaTeamIds[TEAM_HORDE]);
+        TC_LOG_DEBUG("bg.arena", "Arena match type: %u for Team1Id: %u - Team2Id: %u started.", m_ArenaType, m_ArenaTeamIds[BATTLEGROUND_TEAM_ALLIANCE_GOLD], m_ArenaTeamIds[BATTLEGROUND_TEAM_HORDE_GREEN]);
 }
 
 void Battleground::AddPlayer(Player* player)
@@ -1663,7 +1663,7 @@ bool Battleground::DelObject(uint32 type)
 
 bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId /*= TEAM_NEUTRAL*/)
 {
-    uint32 entry = (teamId == TEAM_ALLIANCE) ? BG_CREATURE_ENTRY_A_SPIRITGUIDE : BG_CREATURE_ENTRY_H_SPIRITGUIDE;
+    uint32 entry = (teamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD) ? BG_CREATURE_ENTRY_A_SPIRITGUIDE : BG_CREATURE_ENTRY_H_SPIRITGUIDE;
 
     if (Creature* creature = AddCreature(entry, type, x, y, z, o, teamId))
     {
@@ -1791,7 +1791,7 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
             if (!creditedPlayer || creditedPlayer == killer)
                 continue;
 
-            if (creditedPlayer->GetTeam() == killer->GetTeam() && creditedPlayer->IsAtGroupRewardDistance(victim))
+            if (creditedPlayer->GetPlayerFaction() == killer->GetPlayerFaction() && creditedPlayer->IsAtGroupRewardDistance(victim))
                 UpdatePlayerScore(creditedPlayer, SCORE_HONORABLE_KILLS, 1);
         }
     }
@@ -1877,7 +1877,7 @@ int32 Battleground::GetObjectType(ObjectGuid guid)
 
 void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
 {
-    Group*& old_raid = TeamID == ALLIANCE ? m_BgRaids[TEAM_ALLIANCE] : m_BgRaids[TEAM_HORDE];
+    Group*& old_raid = TeamID == ALLIANCE ? m_BgRaids[BATTLEGROUND_TEAM_ALLIANCE_GOLD] : m_BgRaids[BATTLEGROUND_TEAM_HORDE_GREEN];
     if (old_raid)
         old_raid->SetBattlegroundGroup(NULL);
     if (bg_raid)
@@ -1887,7 +1887,7 @@ void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
 
 WorldSafeLocsEntry const* Battleground::GetClosestGraveYard(Player* player)
 {
-    return sObjectMgr->GetClosestGraveYard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam());
+    return sObjectMgr->GetClosestGraveYard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetPlayerFaction());
 }
 
 void Battleground::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
@@ -1911,7 +1911,7 @@ void Battleground::RewardXPAtKill(Player* killer, Player* victim)
 
 uint32 Battleground::GetTeamScore(uint32 teamId) const
 {
-    if (teamId == TEAM_ALLIANCE || teamId == TEAM_HORDE)
+    if (teamId == BATTLEGROUND_TEAM_ALLIANCE_GOLD || teamId == BATTLEGROUND_TEAM_HORDE_GREEN)
         return m_TeamScores[teamId];
 
     TC_LOG_ERROR("bg.battleground", "GetTeamScore with wrong Team %u for BG %u", teamId, GetTypeID());

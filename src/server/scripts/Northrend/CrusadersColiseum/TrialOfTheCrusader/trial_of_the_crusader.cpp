@@ -186,7 +186,7 @@ class npc_announcer_toc10 : public CreatureScript
             }
             else if (instance->GetBossState(BOSS_CRUSADERS) != DONE)
             {
-                if (player->GetTeam() == ALLIANCE)
+                if (player->GetPlayerFaction() == ALLIANCE)
                     instance->SetData(TYPE_EVENT, 3000);
                 else
                     instance->SetData(TYPE_EVENT, 3001);
@@ -199,7 +199,7 @@ class npc_announcer_toc10 : public CreatureScript
             }
             else if (instance->GetBossState(BOSS_LICH_KING) != DONE)
             {
-                if (creature->GetMap()->GetPlayers().getFirst()->GetSource()->GetTeam() == ALLIANCE)
+                if (creature->GetMap()->GetPlayers().getFirst()->GetSource()->GetPlayerFaction() == ALLIANCE)
                     instance->SetData(TYPE_EVENT, 4020);
                 else
                     instance->SetData(TYPE_EVENT, 4030);

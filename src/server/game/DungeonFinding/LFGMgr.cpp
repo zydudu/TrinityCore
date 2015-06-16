@@ -1620,9 +1620,9 @@ LfgLockMap const LFGMgr::GetLockedDungeons(ObjectGuid guid)
         {
             if (ar->achievement && !player->HasAchieved(ar->achievement))
                 lockStatus = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
-            else if (player->GetTeam() == ALLIANCE && ar->quest_A && !player->GetQuestRewardStatus(ar->quest_A))
+            else if (player->GetPlayerFaction() == ALLIANCE && ar->quest_A && !player->GetQuestRewardStatus(ar->quest_A))
                 lockStatus = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
-            else if (player->GetTeam() == HORDE && ar->quest_H && !player->GetQuestRewardStatus(ar->quest_H))
+            else if (player->GetPlayerFaction() == HORDE && ar->quest_H && !player->GetQuestRewardStatus(ar->quest_H))
                 lockStatus = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
             else
                 if (ar->item)

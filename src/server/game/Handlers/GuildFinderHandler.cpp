@@ -90,7 +90,7 @@ void WorldSession::HandleGuildFinderBrowse(WorldPacket& recvPacket)
     Player* player = GetPlayer();
 
     LFGuildPlayer settings(player->GetGUID(), classRoles, availability, guildInterests, ANY_FINDER_LEVEL);
-    LFGuildStore guildList = sGuildFinderMgr->GetGuildsMatchingSetting(settings, player->GetTeamId());
+    LFGuildStore guildList = sGuildFinderMgr->GetGuildsMatchingSetting(settings, player->GetBattlegroundTeamId());
     uint32 guildCount = guildList.size();
 
     if (guildCount == 0)
@@ -430,6 +430,6 @@ void WorldSession::HandleGuildFinderSetGuildPost(WorldPacket& recvPacket)
     if (guild->GetLeaderGUID() != player->GetGUID())
         return;
 
-    LFGuildSettings settings(listed, player->GetTeamId(), guild->GetGUID(), classRoles, availability, guildInterests, level, comment);
+    LFGuildSettings settings(listed, player->GetBattlegroundTeamId(), guild->GetGUID(), classRoles, availability, guildInterests, level, comment);
     sGuildFinderMgr->SetGuildSettings(guild->GetGUID(), settings);
 }

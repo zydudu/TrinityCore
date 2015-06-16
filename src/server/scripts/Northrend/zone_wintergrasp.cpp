@@ -154,7 +154,7 @@ class npc_wg_demolisher_engineer : public CreatureScript
                         creature->CastSpell(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
                         break;
                     case 2:
-                        creature->CastSpell(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
+                        creature->CastSpell(player, player->GetBattlegroundTeamId() == BATTLEGROUND_TEAM_ALLIANCE_GOLD ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
                         break;
                 }
                 if (Creature* controlArms = creature->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
@@ -198,7 +198,7 @@ class npc_wg_spirit_guide : public CreatureScript
 
             GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
             for (uint8 i = 0; i < graveyard.size(); i++)
-                if (graveyard[i]->GetControlTeamId() == player->GetTeamId())
+                if (graveyard[i]->GetControlTeamId() == player->GetBattlegroundTeamId())
                     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, player->GetSession()->GetTrinityString(((BfGraveyardWG*)graveyard[i])->GetTextId()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + i);
 
             player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
@@ -214,7 +214,7 @@ class npc_wg_spirit_guide : public CreatureScript
             {
                 GraveyardVect gy = wintergrasp->GetGraveyardVector();
                 for (uint8 i = 0; i < gy.size(); i++)
-                    if (action - GOSSIP_ACTION_INFO_DEF == i && gy[i]->GetControlTeamId() == player->GetTeamId())
+                    if (action - GOSSIP_ACTION_INFO_DEF == i && gy[i]->GetControlTeamId() == player->GetBattlegroundTeamId())
                         if (WorldSafeLocsEntry const* safeLoc = sWorldSafeLocsStore.LookupEntry(gy[i]->GetGraveyardId()))
                             player->TeleportTo(safeLoc->MapID, safeLoc->Loc.X, safeLoc->Loc.Y, safeLoc->Loc.Z, 0);
             }
@@ -426,7 +426,7 @@ class npc_wg_quest_giver : public CreatureScript
                         case QUEST_FUELING_THE_DEMOLISHERS_HORDE_ATT:
                         case QUEST_HEALING_WITH_ROSES_HORDE_ATT:
                         case QUEST_DEFEND_THE_SIEGE_HORDE_ATT:
-                            if (wintergrasp->GetAttackerTeam() != TEAM_HORDE)
+                            if (wintergrasp->GetAttackerTeam() != BATTLEGROUND_TEAM_HORDE_GREEN)
                                 continue;
                             break;
                         // Horde defender
@@ -437,7 +437,7 @@ class npc_wg_quest_giver : public CreatureScript
                         case QUEST_HEALING_WITH_ROSES_HORDE_DEF:
                         case QUEST_TOPPLING_THE_TOWERS_HORDE_DEF:
                         case QUEST_STOP_THE_SIEGE_HORDE_DEF:
-                            if (wintergrasp->GetDefenderTeam() != TEAM_HORDE)
+                            if (wintergrasp->GetDefenderTeam() != BATTLEGROUND_TEAM_HORDE_GREEN)
                                 continue;
                             break;
                         // Alliance attacker
@@ -446,7 +446,7 @@ class npc_wg_quest_giver : public CreatureScript
                         case QUEST_NO_MERCY_FOR_THE_MERCILESS_ALLIANCE_ATT:
                         case QUEST_DEFEND_THE_SIEGE_ALLIANCE_ATT:
                         case QUEST_A_RARE_HERB_ALLIANCE_ATT:
-                            if (wintergrasp->GetAttackerTeam() != TEAM_ALLIANCE)
+                            if (wintergrasp->GetAttackerTeam() != BATTLEGROUND_TEAM_ALLIANCE_GOLD)
                                 continue;
                             break;
                         // Alliance defender
@@ -456,7 +456,7 @@ class npc_wg_quest_giver : public CreatureScript
                         case QUEST_SHOUTHERN_SABOTAGE_ALLIANCE_DEF:
                         case QUEST_STOP_THE_SIEGE_ALLIANCE_DEF:
                         case QUEST_A_RARE_HERB_ALLIANCE_DEF:
-                            if (wintergrasp->GetDefenderTeam() != TEAM_ALLIANCE)
+                            if (wintergrasp->GetDefenderTeam() != BATTLEGROUND_TEAM_ALLIANCE_GOLD)
                                 continue;
                             break;
                         default:
@@ -582,7 +582,7 @@ public:
             if (Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
                 if (Player* target = GetExplTargetUnit()->ToPlayer())
                     // check if we are in Wintergrasp at all, SotA uses same teleport spells
-                    if ((target->GetZoneId() == 4197 && target->GetTeamId() != wg->GetDefenderTeam()) || target->HasAura(SPELL_WINTERGRASP_TELEPORT_TRIGGER))
+                    if ((target->GetZoneId() == 4197 && target->GetBattlegroundTeamId() != wg->GetDefenderTeam()) || target->HasAura(SPELL_WINTERGRASP_TELEPORT_TRIGGER))
                         return SPELL_FAILED_BAD_TARGETS;
             return SPELL_CAST_OK;
         }

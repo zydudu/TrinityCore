@@ -954,7 +954,7 @@ class spell_item_scroll_of_recall : public SpellScriptLoader
 
                     // ALLIANCE from 60323 to 60330 - HORDE from 60328 to 60335
                     uint32 spellId = SPELL_SCROLL_OF_RECALL_FAIL_ALLIANCE_1;
-                    if (GetCaster()->ToPlayer()->GetTeam() == HORDE)
+                    if (GetCaster()->ToPlayer()->GetPlayerFaction() == HORDE)
                         spellId = SPELL_SCROLL_OF_RECALL_FAIL_HORDE_1;
 
                     GetCaster()->CastSpell(GetCaster(), spellId + urand(0, 7), true);
@@ -2219,15 +2219,15 @@ class spell_item_brewfest_mount_transformation : public SpellScriptLoader
                     {
                         case SPELL_BREWFEST_MOUNT_TRANSFORM:
                             if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
-                                spell_id = caster->GetTeam() == ALLIANCE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
+                                spell_id = caster->GetPlayerFaction() == ALLIANCE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                             else
-                                spell_id = caster->GetTeam() == ALLIANCE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
+                                spell_id = caster->GetPlayerFaction() == ALLIANCE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
                             break;
                         case SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE:
                             if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
-                                spell_id = caster->GetTeam() == HORDE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
+                                spell_id = caster->GetPlayerFaction() == HORDE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                             else
-                                spell_id = caster->GetTeam() == HORDE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
+                                spell_id = caster->GetPlayerFaction() == HORDE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
                             break;
                         default:
                             return;
@@ -2328,7 +2328,7 @@ class spell_item_teach_language : public SpellScriptLoader
                 Player* caster = GetCaster()->ToPlayer();
 
                 if (roll_chance_i(34))
-                    caster->CastSpell(caster, caster->GetTeam() == ALLIANCE ? SPELL_LEARN_GNOMISH_BINARY : SPELL_LEARN_GOBLIN_BINARY, true);
+                    caster->CastSpell(caster, caster->GetPlayerFaction() == ALLIANCE ? SPELL_LEARN_GNOMISH_BINARY : SPELL_LEARN_GOBLIN_BINARY, true);
             }
 
             void Register() override

@@ -46,9 +46,9 @@ void WorldSession::HandleJoinChannel(WorldPackets::Channel::JoinChannel& packet)
     if (isdigit(packet.ChannelName[0]))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetPlayerFaction()))
     {
-        cMgr->SetTeam(GetPlayer()->GetTeam());
+        cMgr->SetTeam(GetPlayer()->GetPlayerFaction());
         if (Channel* channel = cMgr->GetJoinChannel(packet.ChannelName, packet.ChatChannelId))
             channel->JoinChannel(GetPlayer(), packet.Password);
     }
@@ -62,7 +62,7 @@ void WorldSession::HandleLeaveChannel(WorldPackets::Channel::LeaveChannel& packe
     if (packet.ChannelName.empty())
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetPlayerFaction()))
     {
         if (Channel* channel = cMgr->GetChannel(packet.ChannelName, GetPlayer()))
             channel->LeaveChannel(GetPlayer(), true);
@@ -76,7 +76,7 @@ void WorldSession::HandleChannelCommand(WorldPackets::Channel::ChannelPlayerComm
     TC_LOG_DEBUG("chat.system", "%s %s ChannelName: %s",
         GetOpcodeNameForLogging(packet.GetOpcode()).c_str(), GetPlayerInfo().c_str(), packet.ChannelName.c_str());
 
-    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetPlayerFaction()))
         if (Channel* channel = cMgr->GetChannel(packet.ChannelName, GetPlayer()))
             (channel->*CommandFunction)(GetPlayer());
 }
@@ -97,7 +97,7 @@ void WorldSession::HandleChannelPlayerCommand(WorldPackets::Channel::ChannelPlay
     if (!normalizePlayerName(packet.Name))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetPlayerFaction()))
         if (Channel* channel = cMgr->GetChannel(packet.ChannelName, GetPlayer()))
             (channel->*CommandFunction)(GetPlayer(), packet.Name);
 }
@@ -115,7 +115,7 @@ void WorldSession::HandleChannelPlayerCommand<&Channel::Password>(WorldPackets::
     TC_LOG_DEBUG("chat.system", "%s %s ChannelName: %s, Password: %s",
         GetOpcodeNameForLogging(packet.GetOpcode()).c_str(), GetPlayerInfo().c_str(), packet.ChannelName.c_str(), packet.Name.c_str());
 
-    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::ForTeam(GetPlayer()->GetPlayerFaction()))
         if (Channel* channel = cMgr->GetChannel(packet.ChannelName, GetPlayer()))
             channel->Password(GetPlayer(), packet.Name);
 }

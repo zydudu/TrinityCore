@@ -1040,7 +1040,7 @@ class spell_gen_create_lance : public SpellScriptLoader
 
                 if (Player* target = GetHitPlayer())
                 {
-                    if (target->GetTeam() == ALLIANCE)
+                    if (target->GetPlayerFaction() == ALLIANCE)
                         GetCaster()->CastSpell(target, SPELL_CREATE_LANCE_ALLIANCE, true);
                     else
                         GetCaster()->CastSpell(target, SPELL_CREATE_LANCE_HORDE, true);

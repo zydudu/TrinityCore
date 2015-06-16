@@ -58,7 +58,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
-            switch (player->GetTeam())
+            switch (player->GetPlayerFaction())
             {
                 case ALLIANCE:
                     creature->setFaction(FACTION_ESCORTEE_A);

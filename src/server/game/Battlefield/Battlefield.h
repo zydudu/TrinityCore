@@ -259,7 +259,7 @@ class Battlefield : public ZoneScript
         // Battlefield - generic methods
         TeamId GetDefenderTeam() { return m_DefenderTeam; }
         TeamId GetAttackerTeam() { return TeamId(1 - m_DefenderTeam); }
-        TeamId GetOtherTeam(TeamId team) { return (team == TEAM_HORDE ? TEAM_ALLIANCE : TEAM_HORDE); }
+        TeamId GetOtherTeam(TeamId team) { return (team == BATTLEGROUND_TEAM_HORDE_GREEN ? BATTLEGROUND_TEAM_ALLIANCE_GOLD : BATTLEGROUND_TEAM_HORDE_GREEN); }
         void SetDefenderTeam(TeamId team) { m_DefenderTeam = team; }
 
         // Group methods

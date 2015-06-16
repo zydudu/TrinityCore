@@ -108,7 +108,7 @@ public:
                 {
                     if (Player* player = me->EnsureVictim()->ToPlayer())
                     {
-                        if (player->GetTeam() == HORDE)
+                        if (player->GetPlayerFaction() == HORDE)
                         {
                             me->CombatStop();
                             me->DeleteThreatList();

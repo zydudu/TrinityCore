@@ -46,14 +46,14 @@ void Arena::AddPlayer(Player* player)
 
     if (player->GetBGTeam() == ALLIANCE)        // gold
     {
-        if (player->GetTeam() == HORDE)
+        if (player->GetPlayerFaction() == HORDE)
             player->CastSpell(player, SPELL_HORDE_GOLD_FLAG, true);
         else
             player->CastSpell(player, SPELL_ALLIANCE_GOLD_FLAG, true);
     }
     else                                        // green
     {
-        if (player->GetTeam() == HORDE)
+        if (player->GetPlayerFaction() == HORDE)
             player->CastSpell(player, SPELL_HORDE_GREEN_FLAG, true);
         else
             player->CastSpell(player, SPELL_ALLIANCE_GREEN_FLAG, true);
@@ -176,7 +176,7 @@ void Arena::EndBattleground(uint32 winner)
                 _arenaTeamScores[loserTeam].Assign(loserTeamRating, loserTeamRating + loserChange, loserMatchmakerRating);
 
                 TC_LOG_DEBUG("bg.arena", "Arena match Type: %u for Team1Id: %u - Team2Id: %u ended. WinnerTeamId: %u. Winner rating: +%d, Loser rating: %d",
-                    GetArenaType(), GetArenaTeamIdByIndex(TEAM_ALLIANCE), GetArenaTeamIdByIndex(TEAM_HORDE), winnerArenaTeam->GetId(), winnerChange, loserChange);
+                    GetArenaType(), GetArenaTeamIdByIndex(BATTLEGROUND_TEAM_ALLIANCE_GOLD), GetArenaTeamIdByIndex(BATTLEGROUND_TEAM_HORDE_GREEN), winnerArenaTeam->GetId(), winnerChange, loserChange);
 
                 if (sWorld->getBoolConfig(CONFIG_ARENA_LOG_EXTENDED_INFO))
                     for (auto const& score : PlayerScores)

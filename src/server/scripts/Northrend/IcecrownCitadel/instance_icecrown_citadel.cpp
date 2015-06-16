@@ -157,7 +157,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             void OnPlayerEnter(Player* player) override
             {
                 if (!TeamInInstance)
-                    TeamInInstance = player->GetTeam();
+                    TeamInInstance = player->GetPlayerFaction();
 
                 if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                     SpawnGunship();
@@ -170,7 +170,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     Map::PlayerList const &players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            TeamInInstance = player->GetTeam();
+                            TeamInInstance = player->GetPlayerFaction();
                 }
 
                 switch (creature->GetEntry())

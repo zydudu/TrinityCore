@@ -43,7 +43,7 @@ class instance_nexus : public InstanceMapScript
             void OnPlayerEnter(Player* player) override
             {
                 if (!_teamInInstance)
-                    _teamInInstance = player->GetTeam();
+                    _teamInInstance = player->GetPlayerFaction();
             }
 
             void OnCreatureCreate(Creature* creature) override

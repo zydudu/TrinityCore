@@ -116,7 +116,7 @@ bool OutdoorPvPZM::Update(uint32 diff)
 
 void OutdoorPvPZM::HandlePlayerEnterZone(Player* player, uint32 zone)
 {
-    if (player->GetTeam() == ALLIANCE)
+    if (player->GetPlayerFaction() == ALLIANCE)
     {
         if (m_GraveYard->GetGraveYardState() & ZM_GRAVEYARD_A)
             player->CastSpell(player, ZM_CAPTURE_BUFF, true);
@@ -171,9 +171,9 @@ void OutdoorPvPZM::HandleKillImpl(Player* player, Unit* killed)
     if (killed->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    if (player->GetTeam() == ALLIANCE && killed->ToPlayer()->GetTeam() != ALLIANCE)
+    if (player->GetPlayerFaction() == ALLIANCE && killed->ToPlayer()->GetPlayerFaction() != ALLIANCE)
         player->CastSpell(player, ZM_AlliancePlayerKillReward, true);
-    else if (player->GetTeam() == HORDE && killed->ToPlayer()->GetTeam() != HORDE)
+    else if (player->GetPlayerFaction() == HORDE && killed->ToPlayer()->GetPlayerFaction() != HORDE)
         player->CastSpell(player, ZM_HordePlayerKillReward, true);
 }
 
@@ -196,7 +196,7 @@ int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, GameObject* go)
             AddObject(0, ZM_Banner_A.entry, ZM_Banner_A.map, ZM_Banner_A.x, ZM_Banner_A.y, ZM_Banner_A.z, ZM_Banner_A.o, ZM_Banner_A.rot0, ZM_Banner_A.rot1, ZM_Banner_A.rot2, ZM_Banner_A.rot3);
             sObjectMgr->RemoveGraveYardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, HORDE);          // rem gy
             sObjectMgr->AddGraveYardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, ALLIANCE, false);   // add gy
-            m_PvP->TeamApplyBuff(TEAM_ALLIANCE, ZM_CAPTURE_BUFF);
+            m_PvP->TeamApplyBuff(BATTLEGROUND_TEAM_ALLIANCE_GOLD, ZM_CAPTURE_BUFF);
             player->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_A);
             m_PvP->SendDefenseMessage(ZM_GRAVEYARD_ZONE, TEXT_TWIN_SPIRE_RUINS_TAKEN_ALLIANCE);
         }
@@ -207,7 +207,7 @@ int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, GameObject* go)
             AddObject(0, ZM_Banner_H.entry, ZM_Banner_H.map, ZM_Banner_H.x, ZM_Banner_H.y, ZM_Banner_H.z, ZM_Banner_H.o, ZM_Banner_H.rot0, ZM_Banner_H.rot1, ZM_Banner_H.rot2, ZM_Banner_H.rot3);
             sObjectMgr->RemoveGraveYardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, ALLIANCE);          // rem gy
             sObjectMgr->AddGraveYardLink(ZM_GRAVEYARD_ID, ZM_GRAVEYARD_ZONE, HORDE, false);   // add gy
-            m_PvP->TeamApplyBuff(TEAM_HORDE, ZM_CAPTURE_BUFF);
+            m_PvP->TeamApplyBuff(BATTLEGROUND_TEAM_HORDE_GREEN, ZM_CAPTURE_BUFF);
             player->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_H);
             m_PvP->SendDefenseMessage(ZM_GRAVEYARD_ZONE, TEXT_TWIN_SPIRE_RUINS_TAKEN_HORDE);
         }
@@ -303,9 +303,9 @@ bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, Gossip
     std::map<ObjectGuid::LowType, uint32>::iterator itr = m_CreatureTypes.find(c->GetSpawnId());
     if (itr != m_CreatureTypes.end())
     {
-        if (itr->second == ZM_ALLIANCE_FIELD_SCOUT && player->GetTeam() == ALLIANCE && m_BothControllingFaction == ALLIANCE && !m_FlagCarrierGUID && m_GraveYardState != ZM_GRAVEYARD_A)
+        if (itr->second == ZM_ALLIANCE_FIELD_SCOUT && player->GetPlayerFaction() == ALLIANCE && m_BothControllingFaction == ALLIANCE && !m_FlagCarrierGUID && m_GraveYardState != ZM_GRAVEYARD_A)
             return true;
-        else if (itr->second == ZM_HORDE_FIELD_SCOUT && player->GetTeam() == HORDE && m_BothControllingFaction == HORDE && !m_FlagCarrierGUID && m_GraveYardState != ZM_GRAVEYARD_H)
+        else if (itr->second == ZM_HORDE_FIELD_SCOUT && player->GetPlayerFaction() == HORDE && m_BothControllingFaction == HORDE && !m_FlagCarrierGUID && m_GraveYardState != ZM_GRAVEYARD_H)
             return true;
     }
     return false;

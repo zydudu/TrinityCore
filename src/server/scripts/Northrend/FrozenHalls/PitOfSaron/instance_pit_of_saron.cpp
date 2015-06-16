@@ -50,7 +50,7 @@ class instance_pit_of_saron : public InstanceMapScript
             void OnPlayerEnter(Player* player) override
             {
                 if (!_teamInInstance)
-                    _teamInInstance = player->GetTeam();
+                    _teamInInstance = player->GetPlayerFaction();
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -60,7 +60,7 @@ class instance_pit_of_saron : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
+                            _teamInInstance = player->GetPlayerFaction();
                 }
 
                 switch (creature->GetEntry())

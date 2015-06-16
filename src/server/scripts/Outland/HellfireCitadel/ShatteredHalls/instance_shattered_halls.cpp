@@ -66,7 +66,7 @@ class instance_shattered_halls : public InstanceMapScript
                 Aura* ex = nullptr;
 
                 if (!_team)
-                    _team = player->GetTeam();
+                    _team = player->GetPlayerFaction();
 
                 player->CastSpell(player, SPELL_REMOVE_KARGATH_EXECUTIONER, true);
 
@@ -123,7 +123,7 @@ class instance_shattered_halls : public InstanceMapScript
                     Map::PlayerList const &players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            _team = player->GetTeam();
+                            _team = player->GetPlayerFaction();
                 }
 
                 switch (creature->GetEntry())

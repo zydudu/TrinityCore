@@ -137,7 +137,7 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
     if (whoRequest.Request.MaxLevel >= MAX_LEVEL)
         whoRequest.Request.MaxLevel = STRONG_MAX_LEVEL;
 
-    uint32 team = _player->GetTeam();
+    uint32 team = _player->GetPlayerFaction();
 
     uint32 gmLevelInWhoList  = sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
 
@@ -150,7 +150,7 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
     {
         Player* target = itr->second;
         // player can see member of other team only if has RBAC_PERM_TWO_SIDE_WHO_LIST
-        if (target->GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+        if (target->GetPlayerFaction() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
             continue;
 
         // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if has RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS
@@ -372,7 +372,7 @@ void WorldSession::HandlePortGraveyard(WorldPackets::Misc::PortGraveyard& /*pack
 void WorldSession::HandleRequestCemeteryList(WorldPackets::Misc::RequestCemeteryList& /*packet*/)
 {
     uint32 zoneId = _player->GetZoneId();
-    uint32 team = _player->GetTeam();
+    uint32 team = _player->GetPlayerFaction();
 
     std::vector<uint32> graveyardIds;
     auto range = sObjectMgr->GraveYardStore.equal_range(zoneId);

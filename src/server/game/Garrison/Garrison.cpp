@@ -275,7 +275,7 @@ void Garrison::Leave() const
 
 GarrisonFactionIndex Garrison::GetFaction() const
 {
-    return _owner->GetTeam() == HORDE ? GARRISON_FACTION_INDEX_HORDE : GARRISON_FACTION_INDEX_ALLIANCE;
+    return _owner->GetPlayerFaction() == HORDE ? GARRISON_FACTION_INDEX_HORDE : GARRISON_FACTION_INDEX_ALLIANCE;
 }
 
 std::vector<Garrison::Plot*> Garrison::GetPlots()

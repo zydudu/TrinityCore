@@ -209,7 +209,7 @@ class spell_q6124_6129_apply_salve : public SpellScriptLoader
                     if (Creature* creatureTarget = GetHitCreature())
                     {
                         uint32 uiNewEntry = 0;
-                        switch (caster->GetTeam())
+                        switch (caster->GetPlayerFaction())
                         {
                             case HORDE:
                                 if (creatureTarget->GetEntry() == NPC_SICKLY_GAZELLE)

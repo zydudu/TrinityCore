@@ -107,7 +107,7 @@ bool OutdoorPvPTF::Update(uint32 diff)
     {
         if (m_AllianceTowersControlled == TF_TOWER_NUM)
         {
-            TeamApplyBuff(TEAM_ALLIANCE, TF_CAPTURE_BUFF);
+            TeamApplyBuff(BATTLEGROUND_TEAM_ALLIANCE_GOLD, TF_CAPTURE_BUFF);
             m_IsLocked = true;
             SendUpdateWorldState(TF_UI_LOCKED_DISPLAY_NEUTRAL, uint32(0));
             SendUpdateWorldState(TF_UI_LOCKED_DISPLAY_HORDE, uint32(0));
@@ -116,7 +116,7 @@ bool OutdoorPvPTF::Update(uint32 diff)
         }
         else if (m_HordeTowersControlled == TF_TOWER_NUM)
         {
-            TeamApplyBuff(TEAM_HORDE, TF_CAPTURE_BUFF);
+            TeamApplyBuff(BATTLEGROUND_TEAM_HORDE_GREEN, TF_CAPTURE_BUFF);
             m_IsLocked = true;
             SendUpdateWorldState(TF_UI_LOCKED_DISPLAY_NEUTRAL, uint32(0));
             SendUpdateWorldState(TF_UI_LOCKED_DISPLAY_HORDE, uint32(1));
@@ -125,8 +125,8 @@ bool OutdoorPvPTF::Update(uint32 diff)
         }
         else
         {
-            TeamCastSpell(TEAM_ALLIANCE, -TF_CAPTURE_BUFF);
-            TeamCastSpell(TEAM_HORDE, -TF_CAPTURE_BUFF);
+            TeamCastSpell(BATTLEGROUND_TEAM_ALLIANCE_GOLD, -TF_CAPTURE_BUFF);
+            TeamCastSpell(BATTLEGROUND_TEAM_HORDE_GREEN, -TF_CAPTURE_BUFF);
         }
         SendUpdateWorldState(TF_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
         SendUpdateWorldState(TF_UI_TOWER_COUNT_H, m_HordeTowersControlled);
@@ -168,7 +168,7 @@ bool OutdoorPvPTF::Update(uint32 diff)
 
 void OutdoorPvPTF::HandlePlayerEnterZone(Player* player, uint32 zone)
 {
-    if (player->GetTeam() == ALLIANCE)
+    if (player->GetPlayerFaction() == ALLIANCE)
     {
         if (m_AllianceTowersControlled >= TF_TOWER_NUM)
             player->CastSpell(player, TF_CAPTURE_BUFF, true);

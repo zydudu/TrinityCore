@@ -148,7 +148,7 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& packet)
 
     if (receiver)
     {
-        receiverTeam = receiver->GetTeam();
+        receiverTeam = receiver->GetPlayerFaction();
         mailsCount = receiver->GetMailSize();
         receiverLevel = receiver->getLevel();
         receiverAccountId = receiver->GetSession()->GetAccountId();
@@ -204,7 +204,7 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& packet)
         }
     }
 
-    if (!accountBound && player->GetTeam() != receiverTeam && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_MAIL))
+    if (!accountBound && player->GetPlayerFaction() != receiverTeam && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_MAIL))
     {
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_YOUR_TEAM);
         return;

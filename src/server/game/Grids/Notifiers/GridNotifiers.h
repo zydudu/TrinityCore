@@ -137,7 +137,7 @@ namespace Trinity
         {
             if (own_team_only)
                 if (Player* player = src->ToPlayer())
-                    team = player->GetTeam();
+                    team = player->GetPlayerFaction();
         }
 
         void Visit(PlayerMapType &m);
@@ -148,7 +148,7 @@ namespace Trinity
         void SendPacket(Player* player)
         {
             // never send packet to self
-            if (player == i_source || (team && player->GetTeam() != team) || skipped_receiver == player)
+            if (player == i_source || (team && player->GetPlayerFaction() != team) || skipped_receiver == player)
                 return;
 
             if (!player->HaveAtClient(i_source))

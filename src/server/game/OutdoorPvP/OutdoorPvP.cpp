@@ -63,14 +63,14 @@ bool OPvPCapturePoint::HandlePlayerEnter(Player* player)
         player->SendUpdateWorldState(m_capturePoint->GetGOInfo()->controlZone.worldstate2, (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
         player->SendUpdateWorldState(m_capturePoint->GetGOInfo()->controlZone.worldstate3, m_neutralValuePct);
     }
-    return m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second;
+    return m_activePlayers[player->GetBattlegroundTeamId()].insert(player->GetGUID()).second;
 }
 
 void OPvPCapturePoint::HandlePlayerLeave(Player* player)
 {
     if (m_capturePoint)
         player->SendUpdateWorldState(m_capturePoint->GetGOInfo()->controlZone.worldState1, 0);
-    m_activePlayers[player->GetTeamId()].erase(player->GetGUID());
+    m_activePlayers[player->GetBattlegroundTeamId()].erase(player->GetGUID());
 }
 
 void OPvPCapturePoint::SendChangePhase()
@@ -256,7 +256,7 @@ OutdoorPvP::~OutdoorPvP()
 
 void OutdoorPvP::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
-    m_players[player->GetTeamId()].insert(player->GetGUID());
+    m_players[player->GetBattlegroundTeamId()].insert(player->GetGUID());
 }
 
 void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
@@ -267,7 +267,7 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     // remove the world state information from the player (we can't keep everyone up to date, so leave out those who are not in the concerning zones)
     if (!player->GetSession()->PlayerLogout())
         SendRemoveWorldStates(player);
-    m_players[player->GetTeamId()].erase(player->GetGUID());
+    m_players[player->GetBattlegroundTeamId()].erase(player->GetGUID());
     TC_LOG_DEBUG("outdoorpvp", "Player %s left an outdoorpvp zone", player->GetName().c_str());
 }
 
@@ -314,7 +314,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
         Player* const player = *itr;
         if (player->IsOutdoorPvPActive())
         {
-            if (m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
+            if (m_activePlayers[player->GetBattlegroundTeamId()].insert(player->GetGUID()).second)
                 HandlePlayerEnter(*itr);
         }
     }
@@ -362,14 +362,14 @@ bool OPvPCapturePoint::Update(uint32 diff)
         if (m_value < -m_maxValue)
             m_value = -m_maxValue;
         m_State = OBJECTIVESTATE_HORDE;
-        m_team = TEAM_HORDE;
+        m_team = BATTLEGROUND_TEAM_HORDE_GREEN;
     }
     else if (m_value > m_minValue) // blue
     {
         if (m_value > m_maxValue)
             m_value = m_maxValue;
         m_State = OBJECTIVESTATE_ALLIANCE;
-        m_team = TEAM_ALLIANCE;
+        m_team = BATTLEGROUND_TEAM_ALLIANCE_GOLD;
     }
     else if (oldValue * m_value <= 0) // grey, go through mid point
     {
@@ -487,7 +487,7 @@ bool OutdoorPvP::IsInsideObjective(Player* player) const
 
 bool OPvPCapturePoint::IsInsideObjective(Player* player) const
 {
-    GuidSet const &plSet = m_activePlayers[player->GetTeamId()];
+    GuidSet const &plSet = m_activePlayers[player->GetBattlegroundTeamId()];
     return plSet.find(player->GetGUID()) != plSet.end();
 }
 
@@ -587,7 +587,7 @@ void OutdoorPvP::RegisterZone(uint32 zoneId)
 
 bool OutdoorPvP::HasPlayer(Player const* player) const
 {
-    GuidSet const &plSet = m_players[player->GetTeamId()];
+    GuidSet const &plSet = m_players[player->GetBattlegroundTeamId()];
     return plSet.find(player->GetGUID()) != plSet.end();
 }
 

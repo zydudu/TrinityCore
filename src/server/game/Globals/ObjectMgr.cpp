@@ -2264,7 +2264,7 @@ bool ObjectMgr::GetPlayerNameAndClassByGUID(ObjectGuid const& guid, std::string&
 uint32 ObjectMgr::GetPlayerTeamByGUID(ObjectGuid const& guid)
 {
     if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-        return player->GetTeam();
+        return player->GetPlayerFaction();
 
     if (CharacterInfo const* characterInfo = sWorld->GetCharacterInfo(guid))
         return Player::TeamForRace(characterInfo->Race);

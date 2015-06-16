@@ -99,7 +99,7 @@ class instance_halls_of_reflection : public InstanceMapScript
             void OnPlayerEnter(Player* player) override
             {
                 if (!_teamInInstance)
-                    _teamInInstance = player->GetTeam();
+                    _teamInInstance = player->GetPlayerFaction();
 
                 if (GetBossState(DATA_MARWYN) == DONE)
                 {
@@ -203,7 +203,7 @@ class instance_halls_of_reflection : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
+                            _teamInInstance = player->GetPlayerFaction();
                 }
 
                 switch (entry)
@@ -384,7 +384,7 @@ class instance_halls_of_reflection : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
+                            _teamInInstance = player->GetPlayerFaction();
                 }
 
                 if (Transport* gunship = sTransportMgr->CreateTransport(_teamInInstance == HORDE ? GO_ORGRIMS_HAMMER : GO_THE_SKYBREAKER, UI64LIT(0), instance))
@@ -398,7 +398,7 @@ class instance_halls_of_reflection : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
+                            _teamInInstance = player->GetPlayerFaction();
                 }
 
                 if (_teamInInstance == ALLIANCE)

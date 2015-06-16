@@ -31,10 +31,10 @@ OutdoorPvPNA::OutdoorPvPNA()
 
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
-    if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeam() != killed->ToPlayer()->GetTeam())
+    if (killed->GetTypeId() == TYPEID_PLAYER && player->GetPlayerFaction() != killed->ToPlayer()->GetPlayerFaction())
     {
         player->KilledMonsterCredit(NA_CREDIT_MARKER); // 0 guid, btw it isn't even used in killedmonster function :S
-        if (player->GetTeam() == ALLIANCE)
+        if (player->GetPlayerFaction() == ALLIANCE)
             player->CastSpell(player, NA_KILL_TOKEN_ALLIANCE, true);
         else
             player->CastSpell(player, NA_KILL_TOKEN_HORDE, true);
@@ -154,7 +154,7 @@ void OPvPCapturePointNA::FactionTakeOver(uint32 team)
         m_WyvernStateNorth = WYVERN_NEU_HORDE;
         m_WyvernStateEast = WYVERN_NEU_HORDE;
         m_WyvernStateWest = WYVERN_NEU_HORDE;
-        m_PvP->TeamApplyBuff(TEAM_ALLIANCE, NA_CAPTURE_BUFF);
+        m_PvP->TeamApplyBuff(BATTLEGROUND_TEAM_ALLIANCE_GOLD, NA_CAPTURE_BUFF);
         m_PvP->SendUpdateWorldState(NA_UI_HORDE_GUARDS_SHOW, 0);
         m_PvP->SendUpdateWorldState(NA_UI_ALLIANCE_GUARDS_SHOW, 1);
         m_PvP->SendUpdateWorldState(NA_UI_GUARDS_LEFT, m_GuardsAlive);
@@ -166,7 +166,7 @@ void OPvPCapturePointNA::FactionTakeOver(uint32 team)
         m_WyvernStateNorth = WYVERN_NEU_ALLIANCE;
         m_WyvernStateEast = WYVERN_NEU_ALLIANCE;
         m_WyvernStateWest = WYVERN_NEU_ALLIANCE;
-        m_PvP->TeamApplyBuff(TEAM_HORDE, NA_CAPTURE_BUFF);
+        m_PvP->TeamApplyBuff(BATTLEGROUND_TEAM_HORDE_GREEN, NA_CAPTURE_BUFF);
         m_PvP->SendUpdateWorldState(NA_UI_HORDE_GUARDS_SHOW, 1);
         m_PvP->SendUpdateWorldState(NA_UI_ALLIANCE_GUARDS_SHOW, 0);
         m_PvP->SendUpdateWorldState(NA_UI_GUARDS_LEFT, m_GuardsAlive);
@@ -203,7 +203,7 @@ bool OutdoorPvPNA::SetupOutdoorPvP()
 void OutdoorPvPNA::HandlePlayerEnterZone(Player* player, uint32 zone)
 {
     // add buffs
-    if (player->GetTeam() == m_obj->GetControllingFaction())
+    if (player->GetPlayerFaction() == m_obj->GetControllingFaction())
         player->CastSpell(player, NA_CAPTURE_BUFF, true);
     OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }

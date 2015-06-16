@@ -429,7 +429,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     {
         // Invitee is online
         inviteeGuid = player->GetGUID();
-        inviteeTeam = player->GetTeam();
+        inviteeTeam = player->GetPlayerFaction();
         inviteeGuildId = player->GetGuildId();
     }
     else
@@ -452,7 +452,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
         return;
     }
 
-    if (_player->GetTeam() != inviteeTeam && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR))
+    if (_player->GetPlayerFaction() != inviteeTeam && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR))
     {
         sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_NOT_ALLIED);
         return;

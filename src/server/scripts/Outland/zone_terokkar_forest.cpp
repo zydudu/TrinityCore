@@ -506,9 +506,9 @@ public:
                     break;
                 case 29:
                     Talk(SAY_PROGRESS_4, player);
-                    if (player->GetTeam() == ALLIANCE)
+                    if (player->GetPlayerFaction() == ALLIANCE)
                         player->GroupEventHappens(QUEST_EFTW_A, me);
-                    else if (player->GetTeam() == HORDE)
+                    else if (player->GetPlayerFaction() == HORDE)
                         player->GroupEventHappens(QUEST_EFTW_H, me);
                     me->SetInFront(player);
                     break;
@@ -531,9 +531,9 @@ public:
         {
             if (Player* player = GetPlayerForEscort())
             {
-                if (player->GetTeam() == ALLIANCE)
+                if (player->GetPlayerFaction() == ALLIANCE)
                     player->FailQuest(QUEST_EFTW_A);
-                else if (player->GetTeam() == HORDE)
+                else if (player->GetPlayerFaction() == HORDE)
                     player->FailQuest(QUEST_EFTW_H);
             }
         }
@@ -671,7 +671,7 @@ public:
             if (npc_akunoAI* pEscortAI = CAST_AI(npc_akuno::npc_akunoAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID());
 
-            if (player->GetTeamId() == TEAM_ALLIANCE)
+            if (player->GetBattlegroundTeamId() == BATTLEGROUND_TEAM_ALLIANCE_GOLD)
                 creature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
             else
                 creature->setFaction(FACTION_ESCORT_H_NEUTRAL_PASSIVE);
