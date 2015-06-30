@@ -46,7 +46,7 @@ endif()
 include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/dep/cppformat
-  ${CMAKE_SOURCE_DIR}/dep/zmqpp
+  ${CMAKE_SOURCE_DIR}/dep/azmq
   ${CMAKE_SOURCE_DIR}/dep/process
   ${CMAKE_SOURCE_DIR}/src/server/shared
   ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
@@ -91,7 +91,6 @@ endif()
 target_link_libraries(bnetserver
   ipc
   shared
-  zmqpp
   format
   ${MYSQL_LIBRARY}
   ${OPENSSL_LIBRARIES}

@@ -21,6 +21,8 @@
 #include "Define.h"
 #include <string>
 
+class ByteBuffer;
+
 enum Channels
 {
     IPC_CHANNEL_BNET,
@@ -65,19 +67,14 @@ namespace Battlenet
     };
 }
 
-namespace zmqpp
-{
-    class message;
-}
+ByteBuffer& operator>>(ByteBuffer& msg, IPCHeader& header);
+ByteBuffer& operator>>(ByteBuffer& msg, Battlenet::RealmHandle& realm);
+ByteBuffer& operator>>(ByteBuffer& msg, Battlenet::Header& header);
+ByteBuffer& operator>>(ByteBuffer& msg, Battlenet::ToonHandle& toonHandle);
 
-zmqpp::message& operator>>(zmqpp::message& msg, IPCHeader& header);
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::RealmHandle& realm);
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::Header& header);
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::ToonHandle& toonHandle);
-
-zmqpp::message& operator<<(zmqpp::message& msg, IPCHeader const& header);
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::RealmHandle const& realm);
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::Header const& header);
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::ToonHandle const& toonHandle);
+ByteBuffer& operator<<(ByteBuffer& msg, IPCHeader const& header);
+ByteBuffer& operator<<(ByteBuffer& msg, Battlenet::RealmHandle const& realm);
+ByteBuffer& operator<<(ByteBuffer& msg, Battlenet::Header const& header);
+ByteBuffer& operator<<(ByteBuffer& msg, Battlenet::ToonHandle const& toonHandle);
 
 #endif // _COMMANDS_H

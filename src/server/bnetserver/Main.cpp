@@ -35,7 +35,6 @@
 #include "RealmList.h"
 #include "SystemConfig.h"
 #include "Util.h"
-#include "ZmqContext.h"
 #include "DatabaseLoader.h"
 #include <cstdlib>
 #include <iostream>
@@ -134,8 +133,6 @@ int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
-    sIpcContext->Initialize();
-
     _ioService = new boost::asio::io_service();
 
     // Get the list of realms for the server
@@ -189,8 +186,6 @@ int main(int argc, char** argv)
     _dbPingTimer->cancel();
 
     sSessionMgr.StopNetwork();
-
-    sIpcContext->Close();
 
     sRealmList->Close();
 

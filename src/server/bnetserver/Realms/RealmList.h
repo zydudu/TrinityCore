@@ -21,13 +21,13 @@
 
 #include "Common.h"
 #include "Realm.h"
-#include "WorldListener.h"
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
 using namespace boost::asio;
+class WorldListener;
 
 /// Storage object for the list of realms on the server
 class RealmList

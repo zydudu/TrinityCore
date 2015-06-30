@@ -18,23 +18,17 @@
 #ifndef BattlenetMgr_h__
 #define BattlenetMgr_h__
 
-#include "ZmqMux.h"
 #include "Commands.h"
-
-namespace zmqpp
-{
-    class socket;
-    class message;
-}
+#include "ZmqSocket.h"
 
 namespace Battlenet
 {
     class ServerManager
     {
-        ServerManager() : _socket(nullptr) { }
+        ServerManager() { }
 
     public:
-        void InitializeConnection();
+        void InitializeConnection(boost::asio::io_service& ioService);
         void CloseConnection();
 
         static ServerManager& Instance()
@@ -46,10 +40,9 @@ namespace Battlenet
         void SendChangeToonOnlineState(uint32 battlenetAccountId, uint32 gameAccountId, ObjectGuid guid, std::string const& name, bool online);
 
     private:
-        void Send(zmqpp::message* msg);
-
         static Header CreateHeader(BnetCommands command);
-        ZmqMux* _socket;
+
+        std::shared_ptr<ZmqSocket> _socket;
     };
 }
 

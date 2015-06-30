@@ -16,8 +16,11 @@ set(ipc_SRCS
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/dep/zmqpp
-  ${CMAKE_SOURCE_DIR}/src/server/shared/
+  ${CMAKE_SOURCE_DIR}/dep/azmq
+  ${CMAKE_SOURCE_DIR}/src/server/shared
+  ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
+  ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
+  ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities
   ${ZMQ_INCLUDE_DIR}
 )
 

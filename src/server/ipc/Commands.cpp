@@ -16,16 +16,16 @@
  */
 
 #include "Commands.h"
-#include <zmqpp/message.hpp>
+#include "ByteBuffer.h"
 
-zmqpp::message& operator>>(zmqpp::message& msg, IPCHeader& header)
+ByteBuffer& operator>>(ByteBuffer& msg, IPCHeader& header)
 {
     msg >> header.Channel;
     msg >> header.Command;
     return msg;
 }
 
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::RealmHandle& realm)
+ByteBuffer& operator>>(ByteBuffer& msg, Battlenet::RealmHandle& realm)
 {
     msg >> realm.Region;
     msg >> realm.Battlegroup;
@@ -33,14 +33,14 @@ zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::RealmHandle& realm)
     return msg;
 }
 
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::Header& header)
+ByteBuffer& operator>>(ByteBuffer& msg, Battlenet::Header& header)
 {
     msg >> header.Ipc;
     msg >> header.Realm;
     return msg;
 }
 
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::ToonHandle& toonHandle)
+ByteBuffer& operator>>(ByteBuffer& msg, Battlenet::ToonHandle& toonHandle)
 {
     msg >> toonHandle.AccountId;
     msg >> toonHandle.GameAccountId;
@@ -49,14 +49,14 @@ zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::ToonHandle& toonHandl
     return msg;
 }
 
-zmqpp::message& operator<<(zmqpp::message& msg, IPCHeader const& header)
+ByteBuffer& operator<<(ByteBuffer& msg, IPCHeader const& header)
 {
     msg << header.Channel;
     msg << header.Command;
     return msg;
 }
 
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::RealmHandle const& realm)
+ByteBuffer& operator<<(ByteBuffer& msg, Battlenet::RealmHandle const& realm)
 {
     msg << realm.Region;
     msg << realm.Battlegroup;
@@ -64,14 +64,14 @@ zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::RealmHandle const& re
     return msg;
 }
 
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::Header const& header)
+ByteBuffer& operator<<(ByteBuffer& msg, Battlenet::Header const& header)
 {
     msg << header.Ipc;
     msg << header.Realm;
     return msg;
 }
 
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::ToonHandle const& toonHandle)
+ByteBuffer& operator<<(ByteBuffer& msg, Battlenet::ToonHandle const& toonHandle)
 {
     msg << toonHandle.AccountId;
     msg << toonHandle.GameAccountId;

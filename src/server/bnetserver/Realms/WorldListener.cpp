@@ -18,7 +18,6 @@
 #include "Log.h"
 #include "SessionManager.h"
 #include "WoWRealmPackets.h"
-#include "ZmqContext.h"
 #include "WorldListener.h"
 
 WorldListener::HandlerTable const WorldListener::_handlers;
@@ -34,47 +33,29 @@ WorldListener::HandlerTable::HandlerTable()
 
 WorldListener::WorldListener(uint16 worldListenPort) : _worldListenPort(worldListenPort)
 {
-    _worldSocket = sIpcContext->CreateNewSocket(zmqpp::socket_type::pull);
 }
 
 WorldListener::~WorldListener()
 {
-    delete _worldSocket;
 }
 
-void WorldListener::Run()
+void WorldListener::Run(boost::asio::io_service& ioService)
 {
-    while (!ProcessExit())
-    {
-        _poller->poll();
-        if (_poller->events(*_worldSocket) & zmqpp::poller::poll_in)
-        {
-            int32 op1;
-            do
-            {
-                zmqpp::message msg;
-                _worldSocket->receive(msg);
-                Dispatch(msg);
-                _worldSocket->get(zmqpp::socket_option::events, op1);
-            } while (op1 & zmqpp::poller::poll_in);
-        }
-    }
-}
-
-void WorldListener::HandleOpen()
-{
-    _worldSocket->bind(std::string("tcp://*:") + std::to_string(_worldListenPort));
-    _poller->add(*_worldSocket);
+    _worldSocket = std::make_shared<ZmqSocket>(ioService, ZMQ_PULL, false);
+    _worldSocket->Bind(std::string("tcp://*:") + std::to_string(_worldListenPort));
     TC_LOG_INFO("server.ipc", "Listening on connections from worldservers...");
+
+    _worldSocket->AsyncRead(std::bind(&WorldListener::Dispatch, this, std::placeholders::_1));
 }
 
-void WorldListener::HandleClose()
+void WorldListener::End()
 {
-    _worldSocket->close();
+    _worldSocket->CloseSocket();
+    _worldSocket.reset();
     TC_LOG_INFO("server.ipc", "Shutting down connections from worldservers...");
 }
 
-void WorldListener::Dispatch(zmqpp::message& msg) const
+void WorldListener::Dispatch(ByteBuffer& msg)
 {
     Battlenet::Header ipcHeader;
     msg >> ipcHeader;
@@ -86,7 +67,7 @@ void WorldListener::Dispatch(zmqpp::message& msg) const
         (this->*_handlers[ipcHeader.Ipc.Command].Handler)(ipcHeader.Realm, msg);
 }
 
-void WorldListener::HandleToonOnlineStatusChange(Battlenet::RealmHandle const& realm, zmqpp::message& msg) const
+void WorldListener::HandleToonOnlineStatusChange(Battlenet::RealmHandle const& realm, ByteBuffer& msg) const
 {
     Battlenet::ToonHandle toonHandle;
     bool online;

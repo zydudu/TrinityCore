@@ -18,24 +18,21 @@
 #ifndef WorldListener_h__
 #define WorldListener_h__
 
-#include "ZMQTask.h"
+#include "ZmqSocket.h"
 #include "Commands.h"
 
-class WorldListener : public ZMQTask
+class WorldListener
 {
 public:
     explicit WorldListener(uint16 worldListenPort);
     ~WorldListener();
-    void Run() override;
-
-protected:
-    void HandleOpen() override;
-    void HandleClose() override;
+    void Run(boost::asio::io_service& ioService);
+    void End();
 
 private:
-    void Dispatch(zmqpp::message& msg) const;
+    void Dispatch(ByteBuffer& msg);
 
-    typedef void(WorldListener::*PacketHandler)(Battlenet::RealmHandle const& realm, zmqpp::message& msg) const;
+    typedef void(WorldListener::*PacketHandler)(Battlenet::RealmHandle const& realm, ByteBuffer& msg) const;
     class HandlerTable
     {
     public:
@@ -53,9 +50,9 @@ private:
         HandlerInfo _handlers[IPC_BNET_MAX_COMMAND];
     };
 
-    void HandleToonOnlineStatusChange(Battlenet::RealmHandle const& realm, zmqpp::message& msg) const;
+    void HandleToonOnlineStatusChange(Battlenet::RealmHandle const& realm, ByteBuffer& msg) const;
 
-    zmqpp::socket* _worldSocket;
+    std::shared_ptr<ZmqSocket> _worldSocket;
     uint16 _worldListenPort;
     static HandlerTable const _handlers;
 };

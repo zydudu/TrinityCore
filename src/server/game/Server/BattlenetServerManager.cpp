@@ -17,22 +17,20 @@
 
 #include "Config.h"
 #include "World.h"
-#include "ZmqContext.h"
 #include "BattlenetServerManager.h"
 
-void Battlenet::ServerManager::InitializeConnection()
+void Battlenet::ServerManager::InitializeConnection(boost::asio::io_service& ioService)
 {
     std::string bnetserverAddress = sConfigMgr->GetStringDefault("BnetServer.Address", "127.0.0.1");
     int32 bnetserverPort = sConfigMgr->GetIntDefault("BnetServer.Port", 1118);
-    _socket = new ZmqMux("inproc://bnetmgr", "tcp://" + bnetserverAddress + ":" + std::to_string(bnetserverPort));
-    _socket->Start();
+    _socket = std::make_shared<ZmqSocket>(ioService, ZMQ_PUSH, false);
+    _socket->Connect("tcp://" + bnetserverAddress + ":" + std::to_string(bnetserverPort));
 }
 
 void Battlenet::ServerManager::CloseConnection()
 {
-    _socket->End();
-    delete _socket;
-    _socket = nullptr;
+    _socket->CloseSocket();
+    _socket.reset();
 }
 
 Battlenet::Header Battlenet::ServerManager::CreateHeader(BnetCommands command)
@@ -57,18 +55,10 @@ void Battlenet::ServerManager::SendChangeToonOnlineState(uint32 battlenetAccount
     toon.Guid = guid.GetCounter();
     toon.Name = name;
 
-    zmqpp::message msg;
+    ByteBuffer msg(0x100);
     msg << header;
     msg << toon;
     msg << online;
 
-    Send(&msg);
-}
-
-void Battlenet::ServerManager::Send(zmqpp::message* msg)
-{
-    if (!_socket)
-        return;
-
-    _socket->Send(msg);
+    _socket->AsyncWrite(msg);
 }
