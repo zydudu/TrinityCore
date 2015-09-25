@@ -658,8 +658,6 @@ enum AccountDataType
 #define GLOBAL_CACHE_MASK           0x15
 #define PER_CHARACTER_CACHE_MASK    0xEA
 
-#define REGISTERED_ADDON_PREFIX_SOFTCAP 64
-
 enum TutorialAction : uint8
 {
     TUTORIAL_ACTION_UPDATE  = 0,
@@ -809,6 +807,7 @@ class WorldSession
         bool PlayerLogout() const { return m_playerLogout; }
         bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }
         bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }
+        bool PlayerDisconnected() const { return !m_Socket; }
 
         void ReadAddonsInfo(ByteBuffer& data);
         void SendAddonsInfo();

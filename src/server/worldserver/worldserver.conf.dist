@@ -953,7 +953,7 @@ Guild.NewsLogRecordsCount = 250
 #
 #    MaxPrimaryTradeSkill
 #        Description: Maximum number of primary professions a character can learn.
-#        Range:       0-10
+#        Range:       0-11
 #        Default:     2
 
 MaxPrimaryTradeSkill = 2
@@ -1159,7 +1159,7 @@ Updates.EnableDatabases = 0
 Updates.SourcePath  = ""
 
 #
-#    Updates.SourcePath
+#    Updates.MySqlCLIPath
 #        Description: The path to your mysql cli binary.
 #                     If the path is left empty, built-in path from cmake is used.
 #        Example:     "C:/Program Files/MySQL/MySQL Server 5.6/bin/mysql.exe"
@@ -1678,6 +1678,7 @@ GM.WhisperingTo = 2
 #                    applied on players when using the .freeze command
 #       Default:     0 - (Original aura duration. Lasts until the .unfreeze command is used)
 #                    N - (Aura duration if unspecified in .freeze command, in seconds)
+
 GM.FreezeAuraDuration = 0
 
 #
@@ -2193,7 +2194,7 @@ AutoBroadcast.Center = 0
 #
 #    AutoBroadcast.Timer
 #        Description: Timer (in milliseconds) for auto broadcasts.
-#        Default:     60000 - (10 minutes)
+#        Default:     600000 - (10 minutes)
 
 AutoBroadcast.Timer = 600000
 
@@ -2310,7 +2311,7 @@ Battleground.RewardLoserHonorLast       = 3500
 #     Wintergrasp.Enable
 #         Description: Enable the Wintergrasp battlefield.
 #         Default:     0 - (Disabled)
-#                      1 - (Enabled, Experimental as of still being in development)
+#                      1 - (Enabled, Experimental as in incomplete, bugged and with crashes)
 
 Wintergrasp.Enable = 0
 
@@ -2601,14 +2602,14 @@ CharDelete.KeepDays = 30
 #
 #     AllowTrackBothResources
 #        Description: Allows players to track herbs and minerals at the same time (if they have the skills)
-#        Default: 0 (do not allow)
-#                 1 (allow)
+#        Default:     0 - (Do not allow)
+#                     1 - (Allow)
 #
-#        Note: The following are client limitations and cannot be coded for:
-#           * The minimap tracking icon will display whichever skill is activated second
-#           * The minimap tracking list will only show a check mark next to the last skill activated (sometimes this
-#              bugs out and doesn't switch the check mark. It has no effect on the actual tracking though).
-#           * The minimap dots are yellow for both resources
+#        Note:        The following are client limitations and cannot be coded for:
+#                     * The minimap tracking icon will display whichever skill is activated second.
+#                     * The minimap tracking list will only show a check mark next to the last skill activated (sometimes this
+#                       bugs out and doesn't switch the check mark. It has no effect on the actual tracking though).
+#                     * The minimap dots are yellow for both resources.
 
 AllowTrackBothResources = 0
 
@@ -2981,6 +2982,19 @@ AuctionHouseBot.Horde.Price.Ratio = 100
 AuctionHouseBot.Neutral.Price.Ratio = 100
 
 #
+#    AuctionHouseBot.Items.QUALITY.Price.Ratio
+#       Description: Percentage by which the price of items sold of each quality is incremented / decreased (for all houses)
+#       Default:     100 - (No change)
+
+AuctionHouseBot.Items.Gray.Price.Ratio = 100
+AuctionHouseBot.Items.White.Price.Ratio = 100
+AuctionHouseBot.Items.Green.Price.Ratio = 100
+AuctionHouseBot.Items.Blue.Price.Ratio = 100
+AuctionHouseBot.Items.Purple.Price.Ratio = 100
+AuctionHouseBot.Items.Orange.Price.Ratio = 100
+AuctionHouseBot.Items.Yellow.Price.Ratio = 100
+
+#
 #    AuctionHouseBot.Items.ItemLevel.*
 #       Description: Prevent seller from listing items below/above this item level
 #       Default:     0 - (Disabled)
@@ -2990,8 +3004,8 @@ AuctionHouseBot.Items.ItemLevel.Max = 0
 
 #
 #    AuctionHouseBot.Items.ReqLevel.*
-#        Prevent seller from listing items below/above this required level
-#    Default: - 0 (Disabled)
+#       Description: Prevent seller from listing items below/above this required level
+#       Default:     0 - (Disabled)
 
 AuctionHouseBot.Items.ReqLevel.Min = 0
 AuctionHouseBot.Items.ReqLevel.Max = 0
@@ -3021,7 +3035,7 @@ AuctionHouseBot.Items.Amount.Orange = 0
 AuctionHouseBot.Items.Amount.Yellow = 0
 
 #
-#    AustionHouseBot.Class.*
+#    AuctionHouseBot.Class.*
 #       Description: Here you can set the class of items you prefer to be show on AH
 #                    These value are sorted by preference, from 0 (disabled) to 10 (max. preference)
 #       Default:     Consumable: 6
@@ -3152,6 +3166,13 @@ AuctionHouseBot.Buyer.Enabled = 0
 AuctionHouseBot.Buyer.Alliance.Enabled = 0
 AuctionHouseBot.Buyer.Horde.Enabled = 0
 AuctionHouseBot.Buyer.Neutral.Enabled = 0
+
+#    AuctionHouseBot.Buyer.ChanceFactor
+#       Description: k value in the formula used for the chance to buy an item "100^(1 + (1 - (AuctionBid / ItemPrice)) / k)"
+#                    It must be a decimal number in the range of (0, +infinity). The higher the number the higher chance to buy overpriced auctions
+#       Default:     2
+
+AuctionHouseBot.Buyer.ChanceFactor = 2
 
 #
 #    AuctionHouseBot.Buyer.Baseprice.QUALITY
