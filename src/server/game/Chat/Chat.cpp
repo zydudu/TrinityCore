@@ -147,7 +147,7 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     if (target)
         target_sec = target->GetSecurity();
     else if (target_account)
-        target_sec = AccountMgr::GetSecurity(target_account, realmHandle.Index);
+        target_sec = AccountMgr::GetSecurity(target_account, realm.Id.Realm);
     else
         return true;                                        // caller must report error for (target == NULL && target_account == 0)
 
@@ -346,7 +346,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
                     fullcmd.c_str(), player->GetName().c_str(), player->GetGUID().ToString().c_str(),
                     m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
                     player->GetPositionZ(), player->GetMapId(),
-                    player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
+                    player->FindMap() ? player->FindMap()->GetMapName() : "Unknown",
                     areaId, areaName.c_str(), zoneName.c_str(),
                     (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                     guid.ToString().c_str());

@@ -47,6 +47,7 @@ enum SocialFlag
 
 struct FriendInfo
 {
+    ObjectGuid WowAccountGuid;
     FriendStatus Status;
     uint8 Flags;
     uint32 Area;
@@ -57,7 +58,8 @@ struct FriendInfo
     FriendInfo() : Status(FRIEND_STATUS_OFFLINE), Flags(0), Area(0), Level(0), Class(0), Note()
     { }
 
-    FriendInfo(uint8 flags, std::string const& note) : Status(FRIEND_STATUS_OFFLINE), Flags(flags), Area(0), Level(0), Class(0), Note(note)
+    FriendInfo(ObjectGuid const& accountGuid, uint8 flags, std::string const& note) : WowAccountGuid(accountGuid), Status(FRIEND_STATUS_OFFLINE),
+        Flags(flags), Area(0), Level(0), Class(0), Note(note)
     { }
 };
 
