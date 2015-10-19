@@ -353,7 +353,7 @@ inline void KillRewarder::_InitXP(Player* player)
     // * otherwise, not in PvP;
     // * not if killer is on vehicle.
     if (_isBattleGround || (!_isPvP && !_killer->GetVehicle()))
-        _xp = Trinity::XP::Gain(player, _victim);
+        _xp = Trinity::XP::Gain(player, _victim, _isBattleGround);
 }
 
 inline void KillRewarder::_RewardHonor(Player* player)
@@ -7905,6 +7905,11 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool formChange /*= fal
         if (!spellproto)
             continue;
 
+        if (spellproto->HasAura(GetMap()->GetDifficultyID(), SPELL_AURA_MOD_XP_PCT)
+            && !GetSession()->GetCollectionMgr()->CanApplyHeirloomXpBonus(item->GetEntry(), getLevel())
+            && sDB2Manager.GetHeirloomByItemId(item->GetEntry()))
+            continue;
+
         ApplyEquipSpell(spellproto, item, apply, formChange);
     }
 }
@@ -8301,6 +8306,7 @@ void Player::_ApplyAllLevelScaleItemMods(bool apply)
                 continue;
 
             _ApplyItemBonuses(m_items[i], i, apply);
+            ApplyItemEquipSpell(m_items[i], apply);
         }
     }
 }
@@ -10869,7 +10875,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
 
             ScalingStatDistributionEntry const* ssd = pProto->GetScalingStatDistribution() ? sScalingStatDistributionStore.LookupEntry(pProto->GetScalingStatDistribution()) : 0;
             // check allowed level (extend range to upper values if MaxLevel more or equal max player level, this let GM set high level with 1...max range items)
-            if (ssd && ssd->MaxLevel < DEFAULT_MAX_LEVEL && ssd->MaxLevel < getLevel())
+            if (ssd && ssd->MaxLevel < DEFAULT_MAX_LEVEL && ssd->MaxLevel < getLevel() && !sDB2Manager.GetHeirloomByItemId(pProto->GetId()))
                 return EQUIP_ERR_NOT_EQUIPPABLE;
 
             uint8 eslot = FindEquipSlot(pProto, slot, swap);
@@ -11398,6 +11404,10 @@ Item* Player::StoreNewItem(ItemPosCountVec const& pos, uint32 itemId, bool updat
         ItemAddedQuestCheck(itemId, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, itemId, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, itemId, 1);
+
+        if (sDB2Manager.GetHeirloomByItemId(itemId))
+            GetSession()->GetCollectionMgr()->AddHeirloom(itemId, 0);
+
         if (randomPropertyId)
             item->SetItemRandomProperties(randomPropertyId);
 
@@ -12204,6 +12214,38 @@ Item* Player::GetItemByEntry(uint32 entry) const
                 return pItem;
 
     return NULL;
+}
+
+std::vector<Item*> Player::GetItemListByEntry(uint32 entry, bool inBankAlso) const
+{
+    std::vector<Item*> itemList = std::vector<Item*>();
+
+    for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (item->GetEntry() == entry)
+                itemList.push_back(item);
+
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Bag* bag = GetBagByPos(i))
+            for (uint32 j = 0; j < bag->GetBagSize(); ++j)
+                if (Item* item = bag->GetItemByPos(j))
+                    if (item->GetEntry() == entry)
+                        itemList.push_back(item);
+
+    for (uint8 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (item->GetEntry() == entry)
+                itemList.push_back(item);
+
+    if (inBankAlso)
+    {
+        for (uint8 i = BANK_SLOT_ITEM_START; i < BANK_SLOT_BAG_END; ++i)
+            if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                if (item->GetEntry() == entry)
+                    itemList.push_back(item);
+    }
+
+    return itemList;
 }
 
 void Player::DestroyItemCount(Item* pItem, uint32 &count, bool update)
@@ -16847,7 +16889,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     }
     else if (map->IsDungeon()) // if map is dungeon...
     {
-        if (!((InstanceMap*)map)->CanEnter(this)) // ... and can't enter map, then look for entry point.
+        if (!((InstanceMap*)map)->CanEnter(this) || !CheckInstanceLoginValid(map)) // ... and can't enter map, then look for entry point.
         {
             areaTrigger = sObjectMgr->GetGoBackTrigger(mapId);
             check = true;
@@ -16874,6 +16916,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
         {
             TC_LOG_ERROR("entities.player", "Player %s %s Map: %u, X: %f, Y: %f, Z: %f, O: %f. Areatrigger not found.",
                 m_name.c_str(), guid.ToString().c_str(), mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+            RelocateToHomebind();
             map = NULL;
         }
     }
@@ -17044,6 +17087,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     _LoadTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
     _LoadSpells(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELLS));
     GetSession()->GetCollectionMgr()->LoadToys();
+    GetSession()->GetCollectionMgr()->LoadHeirlooms();
 
     LearnSpecializationSpells();
 
@@ -17494,6 +17538,8 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
             {
                 ObjectGuid bagGuid = fields[21].GetUInt64() ? ObjectGuid::Create<HighGuid::Item>(fields[21].GetUInt64()) : ObjectGuid::Empty;
                 uint8 slot = fields[22].GetUInt8();
+
+                GetSession()->GetCollectionMgr()->CheckHeirloomUpgrades(item);
 
                 uint8 err = EQUIP_ERR_OK;
                 // Item is not in bag
@@ -18556,15 +18602,12 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
     return true;
 }
 
-bool Player::CheckInstanceLoginValid()
+bool Player::CheckInstanceLoginValid(Map* map)
 {
-    if (!FindMap())
-        return false;
-
-    if (!GetMap()->IsDungeon() || IsGameMaster())
+    if (!map->IsDungeon() || IsGameMaster())
         return true;
 
-    if (GetMap()->IsRaid())
+    if (map->IsRaid())
     {
         // cannot be in raid instance without a group
         if (!GetGroup())
@@ -18573,12 +18616,12 @@ bool Player::CheckInstanceLoginValid()
     else
     {
         // cannot be in normal instance without a group and more players than 1 in instance
-        if (!GetGroup() && GetMap()->GetPlayersCountExceptGMs() > 1)
+        if (!GetGroup() && map->GetPlayersCountExceptGMs() > 1)
             return false;
     }
 
     // do checks for satisfy accessreqs, instance full, encounter in progress (raid), perm bind group != perm bind player
-    return sMapMgr->CanPlayerEnter(GetMap()->GetId(), this, true);
+    return sMapMgr->CanPlayerEnter(map->GetId(), this, true);
 }
 
 bool Player::CheckInstanceCount(uint32 instanceId) const
@@ -18994,6 +19037,7 @@ void Player::SaveToDB(bool create /*=false*/)
     trans = LoginDatabase.BeginTransaction();
     GetSession()->GetCollectionMgr()->SaveAccountToys(trans);
     GetSession()->GetBattlePetMgr()->SaveToDB(trans);
+    GetSession()->GetCollectionMgr()->SaveAccountHeirlooms(trans);
     LoginDatabase.CommitTransaction(trans);
 
     // save pet (hunter pet level and experience and all type pets health/mana).
@@ -22448,6 +22492,12 @@ void Player::SendInitialPacketsBeforeAddToMap()
     toysUpdate.IsFullUpdate = true;
     toysUpdate.Toys = &GetSession()->GetCollectionMgr()->GetAccountToys();
     SendDirectMessage(toysUpdate.Write());
+
+    // SMSG_ACCOUNT_HEIRLOOM_UPDATE
+    WorldPackets::Misc::AccountHeirloomUpdate heirloomUpdate;
+    heirloomUpdate.IsFullUpdate = true;
+    heirloomUpdate.Heirlooms = &GetSession()->GetCollectionMgr()->GetAccountHeirlooms();
+    SendDirectMessage(heirloomUpdate.Write());
 
     WorldPackets::Character::InitialSetup initialSetup;
     initialSetup.ServerExpansionLevel = sWorld->getIntConfig(CONFIG_EXPANSION);

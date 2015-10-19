@@ -1404,6 +1404,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = NULL) const;
         Item* GetItemByGuid(ObjectGuid guid) const;
         Item* GetItemByEntry(uint32 entry) const;
+        std::vector<Item*> GetItemListByEntry(uint32 entry, bool inBankAlso = false) const;
         Item* GetItemByPos(uint16 pos) const;
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
         Item* GetUseableItemByPos(uint8 bag, uint8 slot) const;
@@ -2127,7 +2128,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateLocalChannels(uint32 newZone);
         void LeaveLFGChannel();
 
-        void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);
+        void SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal);
         uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus
         uint16 GetPureMaxSkillValue(uint32 skill) const;    // max
         uint16 GetSkillValue(uint32 skill) const;           // skill value + perm. bonus + temp bonus
@@ -2441,7 +2442,7 @@ class Player : public Unit, public GridObject<Player>
         void SendRaidInfo();
         static void ConvertInstancesToGroup(Player* player, Group* group, bool switchLeader);
         bool Satisfy(AccessRequirement const* ar, uint32 target_map, bool report = false);
-        bool CheckInstanceLoginValid();
+        bool CheckInstanceLoginValid(Map* map);
         bool CheckInstanceCount(uint32 instanceId) const;
         void AddInstanceEnterTime(uint32 instanceId, time_t enterTime);
 
