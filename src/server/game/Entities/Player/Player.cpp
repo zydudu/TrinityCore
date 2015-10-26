@@ -6788,7 +6788,7 @@ void Player::SendNewCurrency(uint32 id) const
     record.Type = entry->ID;
     record.Quantity = itr->second.Quantity;
     record.WeeklyQuantity = itr->second.WeeklyQuantity;
-    record.MaxWeeklyQuantity = GetCurrencyWeekCap(entry) / ((entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1);
+    record.MaxWeeklyQuantity = GetCurrencyWeekCap(entry);
     record.TrackedQuantity = itr->second.TrackedQuantity;
     record.Flags = itr->second.Flags;
 
@@ -6814,7 +6814,7 @@ void Player::SendCurrencies() const
         record.Type = entry->ID;
         record.Quantity = itr->second.Quantity;
         record.WeeklyQuantity = itr->second.WeeklyQuantity;
-        record.MaxWeeklyQuantity = GetCurrencyWeekCap(entry) / ((entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1);
+        record.MaxWeeklyQuantity = GetCurrencyWeekCap(entry);
         record.TrackedQuantity = itr->second.TrackedQuantity;
         record.Flags = itr->second.Flags;
 
@@ -6827,38 +6827,32 @@ void Player::SendCurrencies() const
 void Player::SendPvpRewards() const
 {
     WorldPacket packet(SMSG_REQUEST_PVP_REWARDS_RESPONSE, 24);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS, true);
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_POINTS, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA, true);
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_RBG, true);
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS, true);
+    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS);
+    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_POINTS);
+    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA);
+    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_RBG);
+    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA);
+    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS);
 
     GetSession()->SendPacket(&packet);
 }
 
-uint32 Player::GetCurrency(uint32 id, bool usePrecision) const
+uint32 Player::GetCurrency(uint32 id) const
 {
     PlayerCurrenciesMap::const_iterator itr = _currencyStorage.find(id);
     if (itr == _currencyStorage.end())
         return 0;
 
-    CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
-    uint32 precision = (usePrecision && currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-    return itr->second.Quantity / precision;
+    return itr->second.Quantity;
 }
 
-uint32 Player::GetCurrencyOnWeek(uint32 id, bool usePrecision) const
+uint32 Player::GetCurrencyOnWeek(uint32 id) const
 {
     PlayerCurrenciesMap::const_iterator itr = _currencyStorage.find(id);
     if (itr == _currencyStorage.end())
         return 0;
 
-    CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
-    uint32 precision = (usePrecision && currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-    return itr->second.WeeklyQuantity / precision;
+    return itr->second.WeeklyQuantity;
 }
 
 bool Player::HasCurrency(uint32 id, uint32 count) const
@@ -6984,15 +6978,13 @@ void Player::SetCurrency(uint32 id, uint32 count, bool /*printLog*/ /*= true*/)
     }
 }
 
-uint32 Player::GetCurrencyWeekCap(uint32 id, bool usePrecision) const
+uint32 Player::GetCurrencyWeekCap(uint32 id) const
 {
     CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(id);
     if (!entry)
         return 0;
 
-    uint32 precision = (usePrecision && entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-    return GetCurrencyWeekCap(entry) / precision;
+    return GetCurrencyWeekCap(entry);
 }
 
 void Player::ResetCurrencyWeekCap()
@@ -7025,7 +7017,7 @@ uint32 Player::GetCurrencyWeekCap(CurrencyTypesEntry const* currency) const
     {
             //original conquest not have week cap
         case CURRENCY_TYPE_CONQUEST_POINTS:
-            return std::max(GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA, false), GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_RBG, false));
+            return std::max(GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA), GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_RBG));
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
             // should add precision mod = 100
             return Trinity::Currency::ConquestRatingCalculator(_maxPersonalArenaRate) * CURRENCY_PRECISION;
@@ -7080,11 +7072,8 @@ void Player::UpdateConquestCurrencyCap(uint32 currency)
         if (!currencyEntry)
             continue;
 
-        uint32 precision = (currencyEntry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
-        uint32 cap = GetCurrencyWeekCap(currencyEntry);
-
         WorldPacket packet(SMSG_SET_MAX_WEEKLY_QUANTITY, 8);
-        packet << uint32(cap / precision);
+        packet << uint32(GetCurrencyWeekCap(currencyEntry));
         packet << uint32(currenciesToUpdate[i]);
         GetSession()->SendPacket(&packet);
     }
@@ -15058,8 +15047,7 @@ bool Player::SatisfyQuestStatus(Quest const* qInfo, bool msg)
 
 bool Player::SatisfyQuestConditions(Quest const* qInfo, bool msg)
 {
-    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_ACCEPT, qInfo->GetQuestId());
-    if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
+    if (!sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_QUEST_ACCEPT, qInfo->GetQuestId(), this))
     {
         if (msg)
         {
@@ -15460,8 +15448,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         if (!quest)
             continue;
 
-        ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId());
-        if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
+        if (!sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId(), this))
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
@@ -15488,8 +15475,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         if (!quest)
             continue;
 
-        ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId());
-        if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
+        if (!sConditionMgr->IsObjectMeetingNotGroupedConditions(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId(), this))
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
@@ -20384,8 +20370,7 @@ void Player::VehicleSpellInitialize()
             continue;
         }
 
-        ConditionList conditions = sConditionMgr->GetConditionsForVehicleSpell(vehicle->GetEntry(), spellId);
-        if (!sConditionMgr->IsObjectMeetToConditions(this, vehicle, conditions))
+        if (!sConditionMgr->IsObjectMeetingVehicleSpellConditions(vehicle->GetEntry(), spellId, this, vehicle))
         {
             TC_LOG_DEBUG("condition", "VehicleSpellInitialize: conditions not met for Vehicle entry %u spell %u", vehicle->ToCreature()->GetEntry(), spellId);
             data << uint16(0) << uint8(0) << uint8(i+8);
@@ -21376,8 +21361,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(creature->GetEntry(), item);
-    if (!sConditionMgr->IsObjectMeetToConditions(this, creature, conditions))
+    if (!sConditionMgr->IsObjectMeetingVendorItemConditions(creature->GetEntry(), item, this, creature))
     {
         TC_LOG_DEBUG("condition", "BuyItemFromVendor: conditions not met for creature entry %u item %u", creature->GetEntry(), item);
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
@@ -23316,16 +23300,18 @@ void Player::UpdateForQuestWorldObjects()
             {
                 //! This code doesn't look right, but it was logically converted to condition system to do the exact
                 //! same thing it did before. It definitely needs to be overlooked for intended functionality.
-                ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
-                bool buildUpdateBlock = false;
-                for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
-                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
-                        buildUpdateBlock = true;
-
-                if (buildUpdateBlock)
+                if (ConditionContainer const* conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId))
                 {
-                    obj->BuildValuesUpdateBlockForPlayer(&udata, this);
-                    break;
+                    bool buildUpdateBlock = false;
+                    for (ConditionContainer::const_iterator jtr = conds->begin(); jtr != conds->end() && !buildUpdateBlock; ++jtr)
+                        if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
+                            buildUpdateBlock = true;
+
+                    if (buildUpdateBlock)
+                    {
+                        obj->BuildValuesUpdateBlockForPlayer(&udata, this);
+                        break;
+                    }
                 }
             }
         }
@@ -25086,9 +25072,7 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
         if (!itr->second.IsFitToRequirements(this, c))
             return false;
 
-        ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(c->GetEntry(), itr->second.spellId);
-        ConditionSourceInfo info = ConditionSourceInfo(const_cast<Player*>(this), const_cast<Creature*>(c));
-        if (sConditionMgr->IsObjectMeetToConditions(info, conds))
+        if (sConditionMgr->IsObjectMeetingSpellClickConditions(c->GetEntry(), itr->second.spellId, const_cast<Player*>(this), const_cast<Creature*>(c)))
             return true;
     }
 

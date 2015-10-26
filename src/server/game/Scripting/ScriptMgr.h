@@ -553,7 +553,7 @@ class CommandScript : public ScriptObject
     public:
 
         // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-        virtual ChatCommand* GetCommands() const = 0;
+        virtual std::vector<ChatCommand> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -602,7 +602,7 @@ class ConditionScript : public ScriptObject
         bool IsDatabaseBound() const final override { return true; }
 
         // Called when a single condition is checked for a player.
-        virtual bool OnConditionCheck(Condition* /*condition*/, ConditionSourceInfo& /*sourceInfo*/) { return true; }
+        virtual bool OnConditionCheck(Condition const* /*condition*/, ConditionSourceInfo& /*sourceInfo*/) { return true; }
 };
 
 class VehicleScript : public ScriptObject
@@ -1013,7 +1013,7 @@ class ScriptMgr
 
     public: /* CommandScript */
 
-        std::vector<ChatCommand*> GetChatCommands();
+        std::vector<ChatCommand> GetChatCommands();
 
     public: /* WeatherScript */
 
@@ -1029,7 +1029,7 @@ class ScriptMgr
 
     public: /* ConditionScript */
 
-        bool OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo);
+        bool OnConditionCheck(Condition const* condition, ConditionSourceInfo& sourceInfo);
 
     public: /* VehicleScript */
 
