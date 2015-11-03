@@ -3120,11 +3120,13 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 28796: // Poison Bolt Volly - Faerlina
                 spellInfo->MaxAffectedTargets = 5;
                 break;
+            case 54835: // Curse of the Plaguebringer - Noth (H)
+                spellInfo->MaxAffectedTargets = 8;
+                break;
             case 40827: // Sinful Beam
             case 40859: // Sinister Beam
             case 40860: // Vile Beam
             case 40861: // Wicked Beam
-            case 54835: // Curse of the Plaguebringer - Noth (H)
             case 54098: // Poison Bolt Volly - Faerlina (H)
                 spellInfo->MaxAffectedTargets = 10;
                 break;
@@ -3226,6 +3228,19 @@ void SpellMgr::LoadSpellInfoCorrections()
                 //! HACK: This spell break quest complete for alliance and on retail not used °_O
                 const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->Effect = 0;
                 break;
+            // VIOLET HOLD SPELLS
+            //
+            case 54258: // Water Globule (Ichoron)
+            case 54264: // Water Globule (Ichoron)
+            case 54265: // Water Globule (Ichoron)
+            case 54266: // Water Globule (Ichoron)
+            case 54267: // Water Globule (Ichoron)
+                // in 3.3.5 there is only one radius in dbc which is 0 yards in this case
+                // use max radius from 4.3.4
+                const_cast<SpellEffectInfo*>(spellInfo->GetEffect(EFFECT_0))->RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_25_YARDS);
+                break;
+            // ENDOF VIOLET HOLD
+            //
             // ULDUAR SPELLS
             //
             case 62374: // Pursued (Flame Leviathan)
