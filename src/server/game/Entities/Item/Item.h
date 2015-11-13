@@ -248,6 +248,8 @@ struct BonusData
     float ItemStatSocketCostMultiplier[MAX_ITEM_PROTO_STATS];
     uint32 SocketColor[MAX_ITEM_PROTO_SOCKETS];
     uint32 AppearanceModID;
+    float RepairCostMultiplier;
+    uint32 ScalingStatDistribution;
 
     void Initialize(ItemTemplate const* proto);
     void Initialize(WorldPackets::Item::ItemInstance const& itemInstance);
@@ -318,7 +320,7 @@ class Item : public Object
         bool GemsFitSockets() const;
 
         uint32 GetCount() const { return GetUInt32Value(ITEM_FIELD_STACK_COUNT); }
-        void SetCount(uint32 value) { SetUInt32Value(ITEM_FIELD_STACK_COUNT, value); }
+        void SetCount(uint32 value);
         uint32 GetMaxStackCount() const { return GetTemplate()->GetMaxStackSize(); }
         uint8 GetGemCountWithID(uint32 GemID) const;
         uint8 GetGemCountWithLimitCategory(uint32 limitCategory) const;
@@ -393,6 +395,8 @@ class Item : public Object
         uint32 GetArmor(Player const* owner) const { return GetTemplate()->GetArmor(GetItemLevel(owner)); }
         void GetDamage(Player const* owner, float& minDamage, float& maxDamage) const { GetTemplate()->GetDamage(GetItemLevel(owner), minDamage, maxDamage); }
         uint32 GetDisplayId() const;
+        float GetRepairCostMultiplier() const { return _bonusData.RepairCostMultiplier; }
+        uint32 GetScalingStatDistribution() const { return _bonusData.ScalingStatDistribution; }
 
         // Item Refund system
         void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = NULL);

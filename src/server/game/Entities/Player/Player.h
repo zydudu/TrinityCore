@@ -28,6 +28,7 @@
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
+#include "SpellHistory.h"
 #include "Unit.h"
 #include "Opcodes.h"
 #include "WorldSession.h"
@@ -1145,7 +1146,7 @@ class TradeData
         Item* GetItem(TradeSlots slot) const;
         bool HasItem(ObjectGuid itemGuid) const;
         TradeSlots GetTradeSlotForItem(ObjectGuid itemGuid) const;
-        void SetItem(TradeSlots slot, Item* item);
+        void SetItem(TradeSlots slot, Item* item, bool update = false);
 
         uint32 GetSpell() const { return m_spell; }
         void SetSpell(uint32 spell_id, Item* castItem = NULL);

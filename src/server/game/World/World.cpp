@@ -1278,6 +1278,7 @@ void World::LoadConfigSettings(bool reload)
     if (m_bool_configs[CONFIG_START_ALL_SPELLS])
         TC_LOG_WARN("server.loading", "PlayerStart.AllSpells enabled - may not function as intended!");
     m_int_configs[CONFIG_HONOR_AFTER_DUEL] = sConfigMgr->GetIntDefault("HonorPointsAfterDuel", 0);
+    m_bool_configs[CONFIG_RESET_DUEL_COOLDOWNS] = sConfigMgr->GetBoolDefault("ResetDuelCooldowns", false);
     m_bool_configs[CONFIG_START_ALL_EXPLORED] = sConfigMgr->GetBoolDefault("PlayerStart.MapsExplored", false);
     m_bool_configs[CONFIG_START_ALL_REP] = sConfigMgr->GetBoolDefault("PlayerStart.AllReputation", false);
     m_bool_configs[CONFIG_ALWAYS_MAXSKILL] = sConfigMgr->GetBoolDefault("AlwaysMaxWeaponSkill", false);
@@ -1749,6 +1750,9 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Skill Extra Item Table...");
     LoadSkillExtraItemTable();
+
+    TC_LOG_INFO("server.loading", "Loading Skill Perfection Data Table...");
+    LoadSkillPerfectItemTable();
 
     TC_LOG_INFO("server.loading", "Loading Skill Fishing base level requirements...");
     sObjectMgr->LoadFishingBaseSkillLevel();

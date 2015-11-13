@@ -165,13 +165,13 @@ Item* TradeData::GetSpellCastItem() const
     return !m_spellCastItem.IsEmpty() ? m_player->GetItemByGuid(m_spellCastItem) : NULL;
 }
 
-void TradeData::SetItem(TradeSlots slot, Item* item)
+void TradeData::SetItem(TradeSlots slot, Item* item, bool update /*= false*/)
 {
     ObjectGuid itemGuid;
     if (item)
         itemGuid = item->GetGUID();
 
-    if (m_items[slot] == itemGuid)
+    if (m_items[slot] == itemGuid && !update)
         return;
 
     m_items[slot] = itemGuid;
@@ -4934,7 +4934,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
             else if (ditemProto->GetClass() == ITEM_CLASS_ARMOR)
                 dmultiplier = dcost->ArmorSubClassCost[ditemProto->GetSubClass()];
 
-            uint32 costs = uint32(LostDurability * dmultiplier * double(dQualitymodEntry->QualityMod));
+            uint32 costs = uint32(LostDurability * dmultiplier * double(dQualitymodEntry->QualityMod) * item->GetRepairCostMultiplier());
 
             costs = uint32(costs * discountMod * sWorld->getRate(RATE_REPAIRCOST));
 
@@ -5318,12 +5318,13 @@ float Player::GetRatingBonusValue(CombatRating cr) const
 
 float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
 {
+    float baseExpertise = 7.5f;
     switch (attType)
     {
         case BASE_ATTACK:
-            return GetUInt32Value(PLAYER_EXPERTISE) / 4.0f;
+            return baseExpertise + GetUInt32Value(PLAYER_EXPERTISE) / 4.0f;
         case OFF_ATTACK:
-            return GetUInt32Value(PLAYER_OFFHAND_EXPERTISE) / 4.0f;
+            return baseExpertise + GetUInt32Value(PLAYER_OFFHAND_EXPERTISE) / 4.0f;
         default:
             break;
     }
@@ -10874,7 +10875,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                     return EQUIP_ERR_CLIENT_LOCKED_OUT;
             }
 
-            ScalingStatDistributionEntry const* ssd = pProto->GetScalingStatDistribution() ? sScalingStatDistributionStore.LookupEntry(pProto->GetScalingStatDistribution()) : 0;
+            ScalingStatDistributionEntry const* ssd = pItem->GetScalingStatDistribution() ? sScalingStatDistributionStore.LookupEntry(pItem->GetScalingStatDistribution()) : 0;
             // check allowed level (extend range to upper values if MaxLevel more or equal max player level, this let GM set high level with 1...max range items)
             if (ssd && ssd->MaxLevel < DEFAULT_MAX_LEVEL && ssd->MaxLevel < getLevel() && !sDB2Manager.GetHeirloomByItemId(pProto->GetId()))
                 return EQUIP_ERR_NOT_EQUIPPABLE;
@@ -15310,6 +15311,16 @@ bool Player::GetQuestRewardStatus(uint32 quest_id) const
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
     if (qInfo)
     {
+        if (qInfo->IsSeasonal() && !qInfo->IsRepeatable())
+        {
+            uint16 eventId = sGameEventMgr->GetEventIdForQuest(qInfo);
+            if (m_seasonalquests.find(eventId) != m_seasonalquests.end())
+                return m_seasonalquests.find(eventId)->second.find(quest_id) != m_seasonalquests.find(eventId)->second.end();
+
+            return false;
+        }
+
+
         // for repeatable quests: rewarded field is set after first reward only to prevent getting XP more than once
         if (!qInfo->IsRepeatable())
             return m_RewardedQuests.find(quest_id) != m_RewardedQuests.end();
@@ -15328,8 +15339,17 @@ QuestStatus Player::GetQuestStatus(uint32 quest_id) const
             return itr->second.Status;
 
         if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id))
+        {
+            if (qInfo->IsSeasonal() && !qInfo->IsRepeatable())
+            {
+                uint16 eventId = sGameEventMgr->GetEventIdForQuest(qInfo);
+                if (m_seasonalquests.find(eventId) == m_seasonalquests.end() || m_seasonalquests.find(eventId)->second.find(quest_id) == m_seasonalquests.find(eventId)->second.end())
+                    return QUEST_STATUS_NONE;
+            }
+
             if (!qInfo->IsRepeatable() && m_RewardedQuests.find(quest_id) != m_RewardedQuests.end())
                 return QUEST_STATUS_REWARDED;
+        }
     }
     return QUEST_STATUS_NONE;
 }
@@ -18733,7 +18753,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setString(index++, GetName());
         stmt->setUInt8(index++, getRace());
         stmt->setUInt8(index++, getClass());
-        stmt->setUInt8(index++, getGender());
+        stmt->setUInt8(index++, GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER));   // save gender from PLAYER_BYTES_3, UNIT_BYTES_0 changes with every transform effect
         stmt->setUInt8(index++, getLevel());
         stmt->setUInt32(index++, GetUInt32Value(PLAYER_XP));
         stmt->setUInt64(index++, GetMoney());
@@ -18855,7 +18875,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setString(index++, GetName());
         stmt->setUInt8(index++, getRace());
         stmt->setUInt8(index++, getClass());
-        stmt->setUInt8(index++, getGender());
+        stmt->setUInt8(index++, GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER));   // save gender from PLAYER_BYTES_3, UNIT_BYTES_0 changes with every transform effect
         stmt->setUInt8(index++, getLevel());
         stmt->setUInt32(index++, GetUInt32Value(PLAYER_XP));
         stmt->setUInt64(index++, GetMoney());
@@ -21110,8 +21130,7 @@ void Player::InitDisplayIds()
             SetNativeDisplayId(info->displayId_m);
             break;
         default:
-            TC_LOG_ERROR("entities.player", "Invalid gender %u for player", gender);
-            return;
+            TC_LOG_ERROR("entities.player", "Player %s (%s) has invalid gender %u", GetName().c_str(), GetGUID().ToString().c_str(), gender);
     }
 }
 
