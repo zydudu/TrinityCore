@@ -326,7 +326,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo) const
                 Unit* unit = object->ToUnit();
                 if (toUnit && unit)
                 {
-                    switch (ConditionValue2)
+                    switch (static_cast<RelationType>(ConditionValue2))
                     {
                         case RELATION_SELF:
                             condMeets = unit == toUnit;
@@ -345,6 +345,8 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo) const
                             break;
                         case RELATION_CREATED_BY:
                             condMeets = unit->GetCreatorGUID() == toUnit->GetGUID();
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -837,7 +839,6 @@ bool ConditionMgr::IsObjectMeetingNotGroupedConditions(ConditionSourceType sourc
 
 bool ConditionMgr::HasConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry) const
 {
-    ConditionContainer spellCond;
     if (sourceType > CONDITION_SOURCE_TYPE_NONE && sourceType < CONDITION_SOURCE_TYPE_MAX)
         if (ConditionStore[sourceType].find(entry) != ConditionStore[sourceType].end())
             return true;

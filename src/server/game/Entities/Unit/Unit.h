@@ -820,7 +820,7 @@ enum MovementFlags
     // to properly calculate all movement
     MOVEMENTFLAG_MASK_CREATURE_ALLOWED =
         MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_ROOT | MOVEMENTFLAG_SWIMMING |
-        MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_WATERWALKING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_HOVER,
+        MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_WATERWALKING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_HOVER | MOVEMENTFLAG_DISABLE_COLLISION,
 
     /// @todo if needed: add more flags to this masks that are exclusive to players
     MOVEMENTFLAG_MASK_PLAYER_ONLY =
@@ -828,7 +828,7 @@ enum MovementFlags
 
     /// Movement flags that have change status opcodes associated for players
     MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE = MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_ROOT |
-        MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_WATERWALKING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_HOVER
+        MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_WATERWALKING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_HOVER | MOVEMENTFLAG_DISABLE_COLLISION
 };
 
 enum MovementFlags2
@@ -1471,7 +1471,8 @@ class Unit : public WorldObject
         bool IsContestedGuard() const;
         bool IsPvP() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP); }
         bool IsFFAPvP() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP); }
-        void SetPvP(bool state);
+        virtual void SetPvP(bool state);
+
         uint32 GetCreatureType() const;
         uint32 GetCreatureTypeMask() const;
 
@@ -1639,7 +1640,7 @@ class Unit : public WorldObject
         void SendTeleportPacket(Position& pos);
         virtual bool UpdatePosition(float x, float y, float z, float ang, bool teleport = false);
         // returns true if unit's position really changed
-        bool UpdatePosition(const Position &pos, bool teleport = false);
+        virtual bool UpdatePosition(const Position &pos, bool teleport = false);
         void UpdateOrientation(float orientation);
         void UpdateHeight(float newZ);
 
@@ -1664,6 +1665,7 @@ class Unit : public WorldObject
         bool SetWaterWalking(bool enable, bool packetOnly = false);
         bool SetFeatherFall(bool enable, bool packetOnly = false);
         bool SetHover(bool enable, bool packetOnly = false);
+        bool SetCollision(bool disable);
         void SendSetVehicleRecId(uint32 vehicleId);
 
         void SetInFront(WorldObject const* target);
