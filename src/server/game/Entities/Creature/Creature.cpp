@@ -444,6 +444,7 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/)
     }
 
     UpdateMovementFlags();
+    LoadCreaturesAddon();
     return true;
 }
 
